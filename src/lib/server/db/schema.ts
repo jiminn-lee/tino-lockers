@@ -1,7 +1,7 @@
-import { pgTable, serial, integer, varchar, boolean } from 'drizzle-orm/pg-core';
+import { pgTable, integer, varchar, boolean } from 'drizzle-orm/pg-core';
 
 export const singleLockers = pgTable('singleLockers', {
-	id: serial('id').primaryKey(),
+	id: varchar().primaryKey(),
 	user_id: integer(),
 	name: varchar(),
 	grade: integer(),
@@ -10,7 +10,7 @@ export const singleLockers = pgTable('singleLockers', {
 });
 
 export const partnerLockers = pgTable('partnerLockers', {
-	id: serial('id').primaryKey(),
+	id: varchar().primaryKey(),
 	user_id: integer(),
 	primary_name: varchar(),
 	primary_grade: integer(),

@@ -26,6 +26,7 @@ export async function POST({ request, locals }: RequestEvent) {
     const data = await request.json();
     if (data.type === 'single') {
       await db.insert(singleLockers).values({ 
+      id: data.student_id, 
       user_id: parseInt(userId),
       name: data.name,
       grade: parseInt(data.grade),
@@ -37,6 +38,7 @@ export async function POST({ request, locals }: RequestEvent) {
     } 
     else if (data.type === 'partner') {
       await db.insert(partnerLockers).values({
+      id: data.student_id, 
       user_id: parseInt(userId),
       primary_name: data.primary_name,
       primary_grade: parseInt(data.primary_grade),
