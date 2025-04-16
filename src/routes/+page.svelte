@@ -14,6 +14,29 @@
 	} from '$lib/schema';
 	import { type SuperValidated, type Infer, superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { authClient } from '$lib/auth-client';
+
+	const signIn = async () =>
+		await authClient.signIn.social({
+			/**
+			 * The social provider id
+			 * @example "github", "google", "apple"
+			 */
+			provider: 'google',
+			/**
+			 * A URL to redirect if an error occurs during the sign in process
+			 */
+			errorCallbackURL: '/',
+			/**
+			 * A URL to redirect if the user is newly registered
+			 */
+			newUserCallbackURL: '/',
+			/**
+			 * disable the automatic redirect to the provider.
+			 * @default false
+			 */
+			disableRedirect: true
+		});
 
 	let {
 		data
@@ -52,7 +75,12 @@
 <main class="flex h-lvh flex-col items-center justify-center gap-2">
 	<h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">Tino Lockers</h1>
 	<p class="leading-7">One simple place to request a new locker!</p>
-	<Button class="mt-4">Sign in with Google</Button>
+	<Button
+		class="mt-4"
+		onclick={() => {
+			signIn();
+		}}>Sign in with Google</Button
+	>
 	<Button class="mt-4" href="#request">Request a locker</Button>
 </main>
 <div id="request" class="flex h-lvh flex-col items-center pt-20">
