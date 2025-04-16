@@ -1,4 +1,5 @@
 import { betterAuth } from 'better-auth';
+import { admin } from 'better-auth/plugins';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { db } from '../server/db';
 import 'dotenv/config';
@@ -16,5 +17,6 @@ export const auth = betterAuth({
 			clientId: process.env.GOOGLE_CLIENT_ID as string,
 			clientSecret: process.env.GOOGLE_CLIENT_SECRET as string
 		}
-	}
+	},
+	plugins: [admin()]
 });
