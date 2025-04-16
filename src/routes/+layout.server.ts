@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
-import { auth } from '$lib/auth';
+import { auth } from '$lib/auth/auth';
 
 export const load: LayoutServerLoad = async ({ request, fetch }) => {
 	const session = await auth.api.getSession({

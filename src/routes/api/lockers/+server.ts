@@ -1,7 +1,7 @@
 import { json, type RequestEvent } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import { partnerLockers, singleLockers } from '$lib/server/db/schema/lockers';
-import { auth } from '$lib/auth';
+import { auth } from '$lib/auth/auth';
 
 export async function GET({ request }: RequestEvent) {
 	try {

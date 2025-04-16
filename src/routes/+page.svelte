@@ -14,7 +14,9 @@
 	} from '$lib/schema';
 	import { type SuperValidated, type Infer, superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { authClient } from '$lib/auth-client';
+	import { authClient } from '$lib/auth/auth-client';
+	import ScrollArea from '$lib/components/ui/scroll-area/scroll-area.svelte';
+	import * as ToggleGroup from '$lib/components/ui/toggle-group/index.js';
 
 	const session = authClient.useSession();
 
@@ -134,6 +136,13 @@
 						<Form.Control>
 							<Form.Label>Student ID</Form.Label>
 							<Input bind:value={$singleFormData.student_id} />
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+					<Form.Field form={singleForm} name="requested_locker_id">
+						<Form.Control>
+							<Form.Label>Choose a locker #</Form.Label>
+							<ScrollArea class="h-80 rounded-md border border-input"></ScrollArea>
 						</Form.Control>
 						<Form.FieldErrors />
 					</Form.Field>
