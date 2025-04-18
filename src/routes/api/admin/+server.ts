@@ -1,71 +1,85 @@
 import { json } from '@sveltejs/kit';
 import type { RequestEvent } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
-import { singleLockers, partnerLockers } from '$lib/server/db/schema/lockers';
+import { singleLockersRequests, partnerLockersRequests } from '$lib/server/db/schema/lockers';
 import { eq } from 'drizzle-orm';
 import { auth } from '$lib/auth/auth';
 
 const isAdmin = async (request: Request) => {
-	const session = await auth.api.getSession({ headers: request.headers });
-	return session && session.user && session.user.role === 'admin';
+    const session = await auth.api.getSession({ headers: request.headers });
+    return session && session.user && session.user.role === 'admin';
 };
 
 export async function GET({ request }: RequestEvent) {
-	try {
-		if (!await isAdmin(request)) {
-			return json({ error: 'Unauthorized access' }, { status: 403 });
-		}
+    try {
+        if (!await isAdmin(request)) {
+            return json({ error: 'Unauthorized access' }, { status: 403 });
+        }
 
-		const singleLockerRequests = await db
-			.select()
-			.from(singleLockers)
-			.where(eq(singleLockers.available, false));
+        const singleRequests = await db
+            .select()
+            .from(singleLockersRequests);
 
-		const partnerLockerRequests = await db
-			.select()
-			.from(partnerLockers)
-			.where(eq(partnerLockers.available, false));
+        const partnerRequests = await db
+            .select()
+            .from(partnerLockersRequests);
 
-		return json({
-			single: singleLockerRequests,
-			partner: partnerLockerRequests
-		});
-	} catch (error) {
-		console.error('Error fetching admin locker requests:', error);
-		return json({ error: 'Failed to fetch requests' }, { status: 500 });
-	}
+        return json({
+            single: singleRequests,
+            partner: partnerRequests
+        });
+    } catch (error) {
+        console.error('Error fetching admin locker requests:', error);
+        return json({ error: 'Failed to fetch requests' }, { status: 500 });
+    }
 }
 
 export async function PUT({ request }: RequestEvent) {
-	try {
-		if (!await isAdmin(request)) {
-			return json({ error: 'Unauthorized access' }, { status: 403 });
-		}
+    try {
+        if (!await isAdmin(request)) {
+            return json({ error: 'Unauthorized access' }, { status: 403 });
+        }
 
-		const data = await request.json();
-		const { id, type, approve } = data;
+        const data = await request.json();
+        const { id, type, status, comments } = data;
 
-		if (!id || !type || approve === undefined) {
-			return json({ error: 'Missing required fields' }, { status: 400 });
-		}
+        if (!id || !type || !status) {
+            return json({ error: 'Missing required fields' }, { status: 400 });
+        }
 
-		if (type === 'single') {
-			await db.update(singleLockers).set({ available: approve }).where(eq(singleLockers.id, id));
-		} else if (type === 'partner') {
-			await db.update(partnerLockers).set({ available: approve }).where(eq(partnerLockers.id, id));
-		} else {
-			return json({ error: 'Invalid locker type' }, { status: 400 });
-		}
+        const updateData = {
+            status,
+            comments: comments || null,
+            date_modified: new Date()
+        };
 
-		return json({
-			success: true,
-			message: `Locker request ${approve ? 'approved' : 'denied'}`
-		});
-	} catch (error) {
-		console.error('Error approving/denying locker request:', error);
-		return json({ error: 'Failed to process request' }, { status: 500 });
-	}
+        if (type === 'single') {
+            await db
+                .update(singleLockersRequests)
+                .set(updateData)
+                .where(eq(singleLockersRequests.id, id));
+        } else if (type === 'partner') {
+            await db
+                .update(partnerLockersRequests)
+                .set(updateData)
+                .where(eq(partnerLockersRequests.id, id));
+        } else {
+            return json({ error: 'Invalid locker type' }, { status: 400 });
+        }
+
+        return json({
+            success: true,
+            message: `Locker request ${status}`
+        });
+    } catch (error) {
+        console.error('Error updating locker request:', error);
+        return json({ error: 'Failed to process request' }, { status: 500 });
+    }
 }
+
+/*
+
+do we need delete?
 
 export async function DELETE({ request }: RequestEvent) {
 	try {
@@ -97,3 +111,5 @@ export async function DELETE({ request }: RequestEvent) {
 		return json({ error: 'Failed to delete request' }, { status: 500 });
 	}
 }
+
+*/

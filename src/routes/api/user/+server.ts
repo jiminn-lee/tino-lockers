@@ -1,6 +1,6 @@
 import { json, type RequestEvent } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
-import { singleLockers, partnerLockers } from '$lib/server/db/schema/lockers';
+import { singleLockersRequests, partnerLockersRequests } from '$lib/server/db/schema/lockers';
 import { eq } from 'drizzle-orm';
 import { singleLockerRequestFormSchema, partnerLockerRequestFormSchema } from '$lib/form-schema';
 import { auth } from '$lib/auth/auth';
@@ -32,13 +32,16 @@ export async function POST({ request }: RequestEvent) {
                 );
             }
 
-            await db.insert(singleLockers).values({
+            await db.insert(singleLockersRequests).values({
                 id: data.student_id.toString(),
                 user_id: parseInt(userId),
                 name: data.name,
                 grade: parseInt(data.grade),
                 student_id: data.student_id,
-                available: false
+                requested_locker_id: data.locker_id || null,
+                status: 'pending',
+                date_modified: new Date(),
+                comments: null
             });
 
             return json({ success: true, message: 'Single locker request submitted' });
@@ -51,7 +54,7 @@ export async function POST({ request }: RequestEvent) {
                 );
             }
 
-            await db.insert(partnerLockers).values({
+            await db.insert(partnerLockersRequests).values({
                 id: data.primary_student_id.toString(),
                 user_id: parseInt(userId),
                 primary_name: data.primary_name,
@@ -60,7 +63,10 @@ export async function POST({ request }: RequestEvent) {
                 secondary_name: data.secondary_name,
                 secondary_grade: parseInt(data.secondary_grade),
                 secondary_student_id: data.secondary_student_id,
-                available: false
+                requested_locker_id: data.locker_id || null,
+                status: 'pending',
+                date_modified: new Date(),
+                comments: null
             });
 
             return json({ success: true, message: 'Partner locker request submitted' });
@@ -84,13 +90,13 @@ export async function GET({ request }: RequestEvent) {
 
         const singleLockerRequests = await db
             .select()
-            .from(singleLockers)
-            .where(eq(singleLockers.user_id, userId));
+            .from(singleLockersRequests)
+            .where(eq(singleLockersRequests.user_id, userId));
 
         const partnerLockerRequests = await db
             .select()
-            .from(partnerLockers)
-            .where(eq(partnerLockers.user_id, userId));
+            .from(partnerLockersRequests)
+            .where(eq(partnerLockersRequests.user_id, userId));
 
         return json({
             single: singleLockerRequests,
