@@ -21,3 +21,6 @@ Thumbs.db
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+scripts/partner-lockers.txt
+scripts/single-lockers.txt
