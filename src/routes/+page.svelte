@@ -134,12 +134,7 @@
 					<Form.Field form={singleForm} name="student_id">
 						<Form.Control>
 							<Form.Label>Student ID</Form.Label>
-							<Input 
-								type="number" 
-								bind:value={$singleFormData.student_id} 
-								min="1000000"
-								max="9999999"
-							/>
+							<Input bind:value={$singleFormData.student_id} />
 						</Form.Control>
 						<Form.FieldErrors />
 					</Form.Field>
@@ -199,12 +194,7 @@
 					<Form.Field form={partnerForm} name="primary_student_id">
 						<Form.Control>
 							<Form.Label>Your Student ID</Form.Label>
-								<Input 
-									type="number" 
-									bind:value={$partnerFormData.primary_student_id} 
-									min="1000000"
-									max="9999999"
-								/>
+							<Input bind:value={$partnerFormData.primary_student_id} />
 						</Form.Control>
 						<Form.FieldErrors />
 					</Form.Field>
@@ -253,12 +243,7 @@
 					<Form.Field form={partnerForm} name="secondary_student_id">
 						<Form.Control>
 							<Form.Label>Partner Student ID</Form.Label>
-								<Input 
-									type="number" 
-									bind:value={$partnerFormData.secondary_student_id} 
-									min="1000000"
-									max="9999999"
-								/>
+							<Input bind:value={$partnerFormData.secondary_student_id} />
 						</Form.Control>
 						<Form.FieldErrors />
 					</Form.Field>
