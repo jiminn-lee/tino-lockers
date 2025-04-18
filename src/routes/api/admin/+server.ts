@@ -1,8 +1,8 @@
 import { json } from '@sveltejs/kit';
 import type { RequestEvent } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
-import { singleLockersRequests, partnerLockersRequests } from '$lib/server/db/schema/lockers';
-import { eq } from 'drizzle-orm';
+import { singleLockers, partnerLockers, singleLockersRequests, partnerLockersRequests } from '$lib/server/db/schema/lockers';
+import { eq, and, isNotNull } from 'drizzle-orm';
 import { auth } from '$lib/auth/auth';
 
 const isAdmin = async (request: Request) => {
@@ -54,15 +54,68 @@ export async function PUT({ request }: RequestEvent) {
         };
 
         if (type === 'single') {
+            const [requestData] = await db
+                .select()
+                .from(singleLockersRequests)
+                .where(and(
+                    eq(singleLockersRequests.id, id),
+                    isNotNull(singleLockersRequests.requested_locker_id)
+                ));
+
+            if (!requestData || !requestData.requested_locker_id) {
+                return json({ error: 'Request not found or no locker specified' }, { status: 404 });
+            }
+
             await db
                 .update(singleLockersRequests)
                 .set(updateData)
                 .where(eq(singleLockersRequests.id, id));
+
+            if (status === 'approved') {
+                await db
+                    .update(singleLockers)
+                    .set({
+                        user_id: requestData.user_id,
+                        name: requestData.name,
+                        grade: requestData.grade,
+                        student_id: requestData.student_id,
+                        available: false
+                    })
+                    .where(eq(singleLockers.id, requestData.requested_locker_id));
+            }
         } else if (type === 'partner') {
+            const [requestData] = await db
+                .select()
+                .from(partnerLockersRequests)
+                .where(and(
+                    eq(partnerLockersRequests.id, id),
+                    isNotNull(partnerLockersRequests.requested_locker_id)
+                ));
+
+            if (!requestData || !requestData.requested_locker_id) {
+                return json({ error: 'Request not found or no locker specified' }, { status: 404 });
+            }
+
             await db
                 .update(partnerLockersRequests)
                 .set(updateData)
                 .where(eq(partnerLockersRequests.id, id));
+
+            if (status === 'approved') {
+                await db
+                    .update(partnerLockers)
+                    .set({
+                        user_id: requestData.user_id,
+                        primary_name: requestData.primary_name,
+                        primary_grade: requestData.primary_grade,
+                        primary_student_id: requestData.primary_student_id,
+                        secondary_name: requestData.secondary_name,
+                        secondary_grade: requestData.secondary_grade,
+                        secondary_student_id: requestData.secondary_student_id,
+                        available: false
+                    })
+                    .where(eq(partnerLockers.id, requestData.requested_locker_id));
+            }
         } else {
             return json({ error: 'Invalid locker type' }, { status: 400 });
         }
