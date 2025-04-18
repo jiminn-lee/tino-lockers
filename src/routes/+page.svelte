@@ -11,12 +11,11 @@
 		singleLockerRequestFormSchema,
 		type PartnerLockerRequestFormSchema,
 		type SingleLockerRequestFormSchema
-	} from '$lib/schema';
+	} from '$lib/form-schema';
 	import { type SuperValidated, type Infer, superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { authClient } from '$lib/auth/auth-client';
 	import ScrollArea from '$lib/components/ui/scroll-area/scroll-area.svelte';
-	import * as ToggleGroup from '$lib/components/ui/toggle-group/index.js';
 
 	const session = authClient.useSession();
 

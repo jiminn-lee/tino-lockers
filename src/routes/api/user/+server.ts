@@ -2,7 +2,7 @@ import { json, type RequestEvent } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import { singleLockers, partnerLockers } from '$lib/server/db/schema/lockers';
 import { eq } from 'drizzle-orm';
-import { singleLockerRequestFormSchema, partnerLockerRequestFormSchema } from '$lib/schema';
+import { singleLockerRequestFormSchema, partnerLockerRequestFormSchema } from '$lib/form-schema';
 
 declare global {
 	namespace App {

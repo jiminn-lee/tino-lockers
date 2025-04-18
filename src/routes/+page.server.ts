@@ -1,7 +1,7 @@
 import type { PageServerLoad } from './$types';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { partnerLockerRequestFormSchema, singleLockerRequestFormSchema } from '$lib/schema';
+import { partnerLockerRequestFormSchema, singleLockerRequestFormSchema } from '$lib/form-schema';
 
 export const load: PageServerLoad = async () => {
 	return {
