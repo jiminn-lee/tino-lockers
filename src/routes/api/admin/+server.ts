@@ -3,15 +3,16 @@ import type { RequestEvent } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import { singleLockers, partnerLockers } from '$lib/server/db/schema/lockers';
 import { eq } from 'drizzle-orm';
+import { auth } from '$lib/auth/auth';
 
-const isAdmin = (locals: any) => {
-	const session = locals.session;
+const isAdmin = async (request: Request) => {
+	const session = await auth.api.getSession({ headers: request.headers });
 	return session && session.user && session.user.role === 'admin';
 };
 
-export async function GET({ locals }: RequestEvent) {
+export async function GET({ request }: RequestEvent) {
 	try {
-		if (!isAdmin(locals)) {
+		if (!await isAdmin(request)) {
 			return json({ error: 'Unauthorized access' }, { status: 403 });
 		}
 
@@ -35,9 +36,9 @@ export async function GET({ locals }: RequestEvent) {
 	}
 }
 
-export async function PUT({ request, locals }: RequestEvent) {
+export async function PUT({ request }: RequestEvent) {
 	try {
-		if (!isAdmin(locals)) {
+		if (!await isAdmin(request)) {
 			return json({ error: 'Unauthorized access' }, { status: 403 });
 		}
 
@@ -66,9 +67,9 @@ export async function PUT({ request, locals }: RequestEvent) {
 	}
 }
 
-export async function DELETE({ request, locals }: RequestEvent) {
+export async function DELETE({ request }: RequestEvent) {
 	try {
-		if (!isAdmin(locals)) {
+		if (!await isAdmin(request)) {
 			return json({ error: 'Unauthorized access' }, { status: 403 });
 		}
 

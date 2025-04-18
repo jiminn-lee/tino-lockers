@@ -19,6 +19,12 @@
 
 	const session = authClient.useSession();
 
+	$effect(() => {
+		if ($session.data) {
+			console.log('session:', $session.data.user);
+		}
+	});
+
 	let {
 		data
 	}: {
@@ -58,7 +64,7 @@
 <main class="flex h-lvh select-none flex-col items-center justify-center gap-2">
 	{#if $session.data}
 		<p class="text-muted-foreground">
-			Logged in as <strong>{$session.data?.user.name}</strong>
+			Logged in as <strong>{$session.data?.user.name}</strong> ({$session.data?.user.role === 'admin' ? 'Admin' : 'Student'})
 		</p>
 	{/if}
 	<h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">Tino Lockers</h1>
