@@ -5,7 +5,15 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { toast } from 'svelte-sonner';
-	import { CirclePlus, KeyRound, LayoutDashboard, LogIn, LogOut } from 'lucide-svelte';
+	import {
+		CirclePlus,
+		KeyRound,
+		LayoutDashboard,
+		LogIn,
+		LogOut,
+		ShieldUser,
+		User
+	} from 'lucide-svelte';
 	import {
 		partnerLockerRequestFormSchema,
 		singleLockerRequestFormSchema,
@@ -63,45 +71,50 @@
 </script>
 
 <main class="flex h-lvh select-none flex-col items-center justify-center gap-2">
-    {#if $session.data}
-        <p class="text-muted-foreground">
-            Logged in as <strong>{$session.data.user.name}</strong>
-        </p>
-    {/if}
-    <h1 class="scroll-m-20 text-5xl font-extrabold tracking-tight">Tino Lockers</h1>
-    <p class="mb-4 leading-7">
-        {#if $session.data?.user?.role === 'user'}
-            One simple place to request a new locker!
-        {:else if $session.data?.user?.role === 'admin'}
-            One simple place to manage your lockers!
-        {:else}
-            Welcome to Tino Lockers!
-        {/if}
-    </p>
-    {#if $session.data}
-        <div class="flex gap-2">
-            {#if $session.data.user?.role === 'user'}
-                <Button href="#request"><CirclePlus /> Request a locker</Button>
-                <Button href="/my-locker" variant="secondary"><KeyRound /> My locker</Button>
-            {:else if $session.data.user?.role === 'admin'}
-                <Button href="/admin"><LayoutDashboard /> Dashboard</Button>
-            {/if}
-            <Button
-                variant="outline"
-                onclick={async () => {
-                    await authClient.signOut();
-                }}><LogOut /> Sign out</Button
-            >
-        </div>
-    {:else}
-        <Button
-            onclick={async () => {
-                await authClient.signIn.social({
-                    provider: 'google'
-                });
-            }}><LogIn /> Sign in with Google</Button
-        >
-    {/if}
+	{#if $session.data}
+		<p class="text-muted-foreground">
+			Logged in as <strong>{$session.data.user.name}</strong>
+			{#if $session.data?.user.role === 'user'}
+				<Badge variant="secondary"><User size={14} class="mr-1" />Student</Badge>
+			{:else if $session.data?.user?.role === 'admin'}
+				<Badge variant="secondary"><ShieldUser size={14} class="mr-1" />Admin</Badge>
+			{/if}
+		</p>
+	{/if}
+	<h1 class="scroll-m-20 text-5xl font-extrabold tracking-tight">Tino Lockers</h1>
+	<p class="mb-4 leading-7">
+		{#if $session.data?.user?.role === 'user'}
+			One simple place to request a new locker!
+		{:else if $session.data?.user?.role === 'admin'}
+			One simple place to manage your lockers!
+		{:else}
+			Welcome to Tino Lockers!
+		{/if}
+	</p>
+	{#if $session.data}
+		<div class="flex gap-2">
+			{#if $session.data.user?.role === 'user'}
+				<Button href="#request"><CirclePlus /> Request a locker</Button>
+				<Button href="/my-locker" variant="secondary"><KeyRound /> My locker</Button>
+			{:else if $session.data.user?.role === 'admin'}
+				<Button href="/admin"><LayoutDashboard /> Dashboard</Button>
+			{/if}
+			<Button
+				variant="outline"
+				onclick={async () => {
+					await authClient.signOut();
+				}}><LogOut /> Sign out</Button
+			>
+		</div>
+	{:else}
+		<Button
+			onclick={async () => {
+				await authClient.signIn.social({
+					provider: 'google'
+				});
+			}}><LogIn /> Sign in with Google</Button
+		>
+	{/if}
 </main>
 {#if $session.data}
 	{#if $session.data.user.role === 'user'}
