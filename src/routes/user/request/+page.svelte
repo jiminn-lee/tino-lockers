@@ -44,6 +44,8 @@
 		}
 	});
 	const { form: partnerFormData, enhance: partnerEnhance } = partnerForm;
+
+	$inspect(data);
 </script>
 
 <main class="mt-10 flex flex-col gap-10">
@@ -128,7 +130,13 @@
 									}}
 								>
 									{#each data.singleLockers as singleLocker}
-										<ToggleGroup.Item value={singleLocker.id}>{singleLocker.id}</ToggleGroup.Item>
+										{#if singleLocker.available === false}
+											<ToggleGroup.Item value={singleLocker.id} disabled
+												>{singleLocker.id}</ToggleGroup.Item
+											>
+										{:else}
+											<ToggleGroup.Item value={singleLocker.id}>{singleLocker.id}</ToggleGroup.Item>
+										{/if}
 									{/each}
 								</ToggleGroup.Root>
 							</ScrollArea>
