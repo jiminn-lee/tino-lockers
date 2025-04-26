@@ -1,7 +1,7 @@
 import { json, type RequestEvent } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
-import { singleLockersRequests, partnerLockersRequests } from '$lib/server/db/schema/lockers';
-import { eq } from 'drizzle-orm';
+import { singleLockersRequests, partnerLockersRequests, singleLockers, partnerLockers } from '$lib/server/db/schema/lockers';
+import { eq, or } from 'drizzle-orm';
 import { singleLockerRequestFormSchema, partnerLockerRequestFormSchema } from '$lib/form-schema';
 import { auth } from '$lib/auth/auth';
 
@@ -89,12 +89,33 @@ export async function GET({ request }: RequestEvent) {
 			.from(partnerLockersRequests)
 			.where(eq(partnerLockersRequests.user_id, session.user.id));
 
+		const singleLocker = await db
+			.select()
+			.from(singleLockers)
+			.where(eq(singleLockers.user_id, parseInt(session.user.id)));
+
+		const partnerLocker = await db
+			.select()
+			.from(partnerLockers)
+			.where(
+				or(
+					eq(partnerLockers.user_id, parseInt(session.user.id)),
+					eq(partnerLockers.user_id, parseInt(session.user.id))
+				)
+			);
+
 		return json({
-			single: singleLockerRequests,
-			partner: partnerLockerRequests
+			requests: {
+				single: singleLockerRequests,
+				partner: partnerLockerRequests
+			},
+			lockers: {
+				single: singleLocker[0] || null,
+				partner: partnerLocker[0] || null
+			}
 		});
 	} catch (error) {
-		console.error('Error fetching user locker requests:', error);
-		return json({ error: 'Failed to fetch requests' }, { status: 500 });
+		console.error('Error fetching user data:', error);
+		return json({ error: 'Failed to fetch data' }, { status: 500 });
 	}
 }
