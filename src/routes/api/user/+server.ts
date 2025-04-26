@@ -90,8 +90,8 @@ export async function GET({ request }: RequestEvent) {
 			.where(eq(partnerLockersRequests.user_id, session.user.id));
 
 		return json({
-			single: singleLockerRequests,
-			partner: partnerLockerRequests
+			singleLockerRequests: singleLockerRequests,
+			partnerLockerRequests: partnerLockerRequests
 		});
 	} catch (error) {
 		console.error('Error fetching user locker requests:', error);
