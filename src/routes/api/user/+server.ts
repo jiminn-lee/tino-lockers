@@ -5,22 +5,15 @@ import { eq } from 'drizzle-orm';
 import { singleLockerRequestFormSchema, partnerLockerRequestFormSchema } from '$lib/form-schema';
 import { auth } from '$lib/auth/auth';
 
-const getSession = async (request: Request) => {
-	const session = await auth.api.getSession({ headers: request.headers });
-	if (!session?.user) {
-		return null;
-	}
-	return session;
-};
-
 export async function POST({ request }: RequestEvent) {
 	try {
-		const session = await getSession(request);
+		const session = await auth.api.getSession({
+			headers: request.headers
+		});
 		if (!session) {
 			return json({ error: 'Unauthorized' }, { status: 401 });
 		}
 
-		const userId = session.user.id;
 		const data = await request.json();
 
 		if (data.type === 'single') {
@@ -33,12 +26,11 @@ export async function POST({ request }: RequestEvent) {
 			}
 
 			await db.insert(singleLockersRequests).values({
-				id: data.student_id.toString(),
-				user_id: parseInt(userId),
+				user_id: session.user.id,
 				name: data.name,
 				grade: parseInt(data.grade),
 				student_id: data.student_id,
-				requested_locker_id: data.locker_id || null,
+				requested_locker_id: data.requested_locker_id || null,
 				status: 'pending',
 				date_modified: new Date(),
 				comments: null
@@ -55,15 +47,14 @@ export async function POST({ request }: RequestEvent) {
 			}
 
 			await db.insert(partnerLockersRequests).values({
-				id: data.primary_student_id.toString(),
-				user_id: parseInt(userId),
+				user_id: session.user.id,
 				primary_name: data.primary_name,
 				primary_grade: parseInt(data.primary_grade),
 				primary_student_id: data.primary_student_id,
 				secondary_name: data.secondary_name,
 				secondary_grade: parseInt(data.secondary_grade),
 				secondary_student_id: data.secondary_student_id,
-				requested_locker_id: data.locker_id || null,
+				requested_locker_id: data.requested_locker_id || null,
 				status: 'pending',
 				date_modified: new Date(),
 				comments: null
@@ -81,22 +72,22 @@ export async function POST({ request }: RequestEvent) {
 
 export async function GET({ request }: RequestEvent) {
 	try {
-		const session = await getSession(request);
+		const session = await auth.api.getSession({
+			headers: request.headers
+		});
 		if (!session) {
 			return json({ error: 'Unauthorized' }, { status: 401 });
 		}
 
-		const userId = parseInt(session.user.id);
-
 		const singleLockerRequests = await db
 			.select()
 			.from(singleLockersRequests)
-			.where(eq(singleLockersRequests.user_id, userId));
+			.where(eq(singleLockersRequests.user_id, session.user.id));
 
 		const partnerLockerRequests = await db
 			.select()
 			.from(partnerLockersRequests)
-			.where(eq(partnerLockersRequests.user_id, userId));
+			.where(eq(partnerLockersRequests.user_id, session.user.id));
 
 		return json({
 			single: singleLockerRequests,
