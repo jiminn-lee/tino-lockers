@@ -1,7 +1,7 @@
 import { json, type RequestEvent } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import { singleLockersRequests, partnerLockersRequests, singleLockers, partnerLockers } from '$lib/server/db/schema/lockers';
-import { eq, or } from 'drizzle-orm';
+import { eq, or, desc } from 'drizzle-orm';
 import { singleLockerRequestFormSchema, partnerLockerRequestFormSchema } from '$lib/form-schema';
 import { auth } from '$lib/auth/auth';
 
@@ -82,12 +82,14 @@ export async function GET({ request }: RequestEvent) {
 		const singleLockerRequests = await db
 			.select()
 			.from(singleLockersRequests)
-			.where(eq(singleLockersRequests.user_id, session.user.id));
+			.where(eq(singleLockersRequests.user_id, session.user.id))
+			.orderBy(desc(singleLockersRequests.date_modified)); // Sort by newest first
 
 		const partnerLockerRequests = await db
 			.select()
 			.from(partnerLockersRequests)
-			.where(eq(partnerLockersRequests.user_id, session.user.id));
+			.where(eq(partnerLockersRequests.user_id, session.user.id))
+			.orderBy(desc(partnerLockersRequests.date_modified)); // Sort by newest first
 
 		const singleLocker = await db
 			.select()
