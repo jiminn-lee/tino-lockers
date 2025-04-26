@@ -1,6 +1,11 @@
 import { json, type RequestEvent } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
-import { singleLockersRequests, partnerLockersRequests, singleLockers, partnerLockers } from '$lib/server/db/schema/lockers';
+import {
+	singleLockersRequests,
+	partnerLockersRequests,
+	singleLockers,
+	partnerLockers
+} from '$lib/server/db/schema/lockers';
 import { eq, or, desc } from 'drizzle-orm';
 import { singleLockerRequestFormSchema, partnerLockerRequestFormSchema } from '$lib/form-schema';
 import { auth } from '$lib/auth/auth';
