@@ -5,6 +5,32 @@ import { eq, or, desc } from 'drizzle-orm';
 import { singleLockerRequestFormSchema, partnerLockerRequestFormSchema } from '$lib/form-schema';
 import { auth } from '$lib/auth/auth';
 
+interface BaseRequest {
+  id: number;
+  user_id: string;
+  status: 'pending' | 'approved' | 'rejected';
+  date_modified: Date;
+  requested_locker_id: string | null;
+  comments: string | null;
+}
+
+interface SingleLockerRequest extends BaseRequest {
+  type: 'single';
+  name: string;
+  grade: number;
+  student_id: string;
+}
+
+interface PartnerLockerRequest extends BaseRequest {
+  type: 'partner';
+  primary_name: string;
+  primary_grade: number;
+  primary_student_id: string;
+  secondary_name: string;
+  secondary_grade: number;
+  secondary_student_id: string;
+}
+
 export async function POST({ request }: RequestEvent) {
 	try {
 		const session = await auth.api.getSession({
@@ -82,14 +108,19 @@ export async function GET({ request }: RequestEvent) {
 		const singleLockerRequests = await db
 			.select()
 			.from(singleLockersRequests)
-			.where(eq(singleLockersRequests.user_id, session.user.id))
-			.orderBy(desc(singleLockersRequests.date_modified)); // Sort by newest first
+			.where(eq(singleLockersRequests.user_id, session.user.id));
 
 		const partnerLockerRequests = await db
 			.select()
 			.from(partnerLockersRequests)
-			.where(eq(partnerLockersRequests.user_id, session.user.id))
-			.orderBy(desc(partnerLockersRequests.date_modified)); // Sort by newest first
+			.where(eq(partnerLockersRequests.user_id, session.user.id));
+
+		const allRequests = [
+			...singleLockerRequests.map(req => ({ ...req, type: 'single' })),
+			...partnerLockerRequests.map(req => ({ ...req, type: 'partner' }))
+		].sort((a, b) => {
+			return new Date(b.date_modified ?? new Date()).getTime() - new Date(a.date_modified ?? new Date()).getTime();
+		});
 
 		const singleLocker = await db
 			.select()
@@ -99,18 +130,10 @@ export async function GET({ request }: RequestEvent) {
 		const partnerLocker = await db
 			.select()
 			.from(partnerLockers)
-			.where(
-				or(
-					eq(partnerLockers.user_id, parseInt(session.user.id)),
-					eq(partnerLockers.user_id, parseInt(session.user.id))
-				)
-			);
+			.where(eq(partnerLockers.user_id, parseInt(session.user.id)));
 
 		return json({
-			requests: {
-				single: singleLockerRequests,
-				partner: partnerLockerRequests
-			},
+			requests: allRequests,
 			lockers: {
 				single: singleLocker[0] || null,
 				partner: partnerLocker[0] || null
