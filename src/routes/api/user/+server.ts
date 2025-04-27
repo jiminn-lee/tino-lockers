@@ -173,15 +173,16 @@ export async function GET({ request }: RequestEvent) {
 			);
 		});
 
+		const userId = session.user.id;
 		const singleLocker = await db
 			.select()
 			.from(singleLockers)
-			.where(eq(singleLockers.user_id, parseInt(session.user.id)));
+			.where(eq(singleLockers.user_id, userId));
 
 		const partnerLocker = await db
 			.select()
 			.from(partnerLockers)
-			.where(eq(partnerLockers.user_id, parseInt(session.user.id)));
+			.where(eq(partnerLockers.user_id, userId));
 
 		return json({
 			requests: allRequests,

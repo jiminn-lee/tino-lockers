@@ -2,7 +2,7 @@ import { pgTable, integer, varchar, boolean, timestamp, text, serial } from 'dri
 
 export const singleLockers = pgTable('singleLockers', {
 	id: varchar().primaryKey(),
-	user_id: integer(),
+	user_id: varchar(),
 	name: varchar(),
 	grade: integer(),
 	student_id: integer(),
@@ -11,7 +11,7 @@ export const singleLockers = pgTable('singleLockers', {
 
 export const partnerLockers = pgTable('partnerLockers', {
 	id: varchar().primaryKey(),
-	user_id: integer(),
+	user_id: varchar(),
 	primary_name: varchar(),
 	primary_grade: integer(),
 	primary_student_id: integer(),
