@@ -7,7 +7,7 @@ import {
 	singleLockersRequests,
 	partnerLockersRequests
 } from '$lib/server/db/schema/lockers';
-import { eq, and, isNotNull } from 'drizzle-orm';
+import { eq, and, isNotNull, desc } from 'drizzle-orm';
 import { auth } from '$lib/auth/auth';
 
 const isAdmin = async (request: Request) => {
@@ -21,9 +21,15 @@ export async function GET({ request }: RequestEvent) {
 			return json({ error: 'Unauthorized access' }, { status: 403 });
 		}
 
-		const singleRequests = await db.select().from(singleLockersRequests);
+		const singleRequests = await db
+			.select()
+			.from(singleLockersRequests)
+			.orderBy((singleLockersRequests) => desc(singleLockersRequests.date_modified));
 
-		const partnerRequests = await db.select().from(partnerLockersRequests);
+		const partnerRequests = await db
+			.select()
+			.from(partnerLockersRequests)
+			.orderBy((partnerLockersRequests) => desc(partnerLockersRequests.date_modified));
 
 		return json({
 			single: singleRequests,
