@@ -85,6 +85,11 @@ export async function PUT({ request }: RequestEvent) {
 						available: false
 					})
 					.where(eq(singleLockers.id, requestData.requested_locker_id));
+			} else if (status === 'denied') {
+				await db
+					.update(singleLockers)
+					.set({ available: true })
+					.where(eq(singleLockers.id, requestData.requested_locker_id));
 			}
 		} else if (type === 'partner') {
 			const [requestData] = await db
@@ -119,6 +124,11 @@ export async function PUT({ request }: RequestEvent) {
 						secondary_student_id: requestData.secondary_student_id,
 						available: false
 					})
+					.where(eq(partnerLockers.id, requestData.requested_locker_id));
+			} else if (status === 'denied') {
+				await db
+					.update(partnerLockers)
+					.set({ available: true })
 					.where(eq(partnerLockers.id, requestData.requested_locker_id));
 			}
 		} else {

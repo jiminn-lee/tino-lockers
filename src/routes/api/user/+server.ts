@@ -13,7 +13,7 @@ import { auth } from '$lib/auth/auth';
 interface BaseRequest {
   id: number;
   user_id: string;
-  status: 'pending' | 'approved' | 'rejected';
+  status: 'pending' | 'approved' | 'denied';
   date_modified: Date;
   requested_locker_id: string | null;
   comments: string | null;
@@ -56,16 +56,35 @@ export async function POST({ request }: RequestEvent) {
 				);
 			}
 
-			await db.insert(singleLockersRequests).values({
-				user_id: session.user.id,
-				name: data.name,
-				grade: parseInt(data.grade),
-				student_id: data.student_id,
-				requested_locker_id: data.requested_locker_id || null,
-				status: 'pending',
-				date_modified: new Date(),
-				comments: null
-			});
+			if (data.requested_locker_id) {
+				await db.transaction(async (tx) => {
+					await tx.insert(singleLockersRequests).values({
+						user_id: session.user.id,
+						name: data.name,
+						grade: parseInt(data.grade),
+						student_id: data.student_id,
+						requested_locker_id: data.requested_locker_id,
+						status: 'pending',
+						date_modified: new Date(),
+						comments: null
+					});
+
+					await tx.update(singleLockers)
+						.set({ available: false })
+						.where(eq(singleLockers.id, data.requested_locker_id));
+				});
+			} else {
+				await db.insert(singleLockersRequests).values({
+					user_id: session.user.id,
+					name: data.name,
+					grade: parseInt(data.grade),
+					student_id: data.student_id,
+					requested_locker_id: data.requested_locker_id || null,
+					status: 'pending',
+					date_modified: new Date(),
+					comments: null
+				});
+			}
 
 			return json({ success: true, message: 'Single locker request submitted' });
 		} else if (data.type === 'partner') {
@@ -77,19 +96,41 @@ export async function POST({ request }: RequestEvent) {
 				);
 			}
 
-			await db.insert(partnerLockersRequests).values({
-				user_id: session.user.id,
-				primary_name: data.primary_name,
-				primary_grade: parseInt(data.primary_grade),
-				primary_student_id: data.primary_student_id,
-				secondary_name: data.secondary_name,
-				secondary_grade: parseInt(data.secondary_grade),
-				secondary_student_id: data.secondary_student_id,
-				requested_locker_id: data.requested_locker_id || null,
-				status: 'pending',
-				date_modified: new Date(),
-				comments: null
-			});
+			if (data.requested_locker_id) {
+				await db.transaction(async (tx) => {
+					await tx.insert(partnerLockersRequests).values({
+						user_id: session.user.id,
+						primary_name: data.primary_name,
+						primary_grade: parseInt(data.primary_grade),
+						primary_student_id: data.primary_student_id,
+						secondary_name: data.secondary_name,
+						secondary_grade: parseInt(data.secondary_grade),
+						secondary_student_id: data.secondary_student_id,
+						requested_locker_id: data.requested_locker_id,
+						status: 'pending',
+						date_modified: new Date(),
+						comments: null
+					});
+
+					await tx.update(partnerLockers)
+						.set({ available: false })
+						.where(eq(partnerLockers.id, data.requested_locker_id));
+				});
+			} else {
+				await db.insert(partnerLockersRequests).values({
+					user_id: session.user.id,
+					primary_name: data.primary_name,
+					primary_grade: parseInt(data.primary_grade),
+					primary_student_id: data.primary_student_id,
+					secondary_name: data.secondary_name,
+					secondary_grade: parseInt(data.secondary_grade),
+					secondary_student_id: data.secondary_student_id,
+					requested_locker_id: data.requested_locker_id || null,
+					status: 'pending',
+					date_modified: new Date(),
+					comments: null
+				});
+			}
 
 			return json({ success: true, message: 'Partner locker request submitted' });
 		}
