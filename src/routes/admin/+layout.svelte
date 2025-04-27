@@ -2,7 +2,6 @@
 	let { children } = $props();
 	import { authClient } from '$lib/auth/auth-client';
 	import BackButton from '$lib/components/BackButton.svelte';
-	import { CircleArrowLeft } from 'lucide-svelte';
 
 	const session = authClient.useSession();
 </script>

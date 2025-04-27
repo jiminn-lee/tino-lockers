@@ -11,7 +11,9 @@ export const load: LayoutServerLoad = async ({ request, fetch }) => {
 		const requestsRes = await fetch('/api/admin');
 		if (requestsRes.status === 200) {
 			requestsData = requestsRes.json();
-			return requestsData;
+			return {
+				requestsData: await requestsData
+			};
 		} else {
 			error(requestsRes.status, requestsRes.statusText);
 		}
