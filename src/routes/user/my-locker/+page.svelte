@@ -1,10 +1,10 @@
 <script>
 	import { Button } from '$lib/components/ui/button';
-	import { CircleArrowLeft, CircleHelp, CirclePlus } from 'lucide-svelte';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 	import * as Carousel from '$lib/components/ui/carousel/index.js';
 	import BackButton from '$lib/components/BackButton.svelte';
+	import { Question } from 'phosphor-svelte';
 	let { data } = $props();
 
 	$inspect(data);
@@ -14,22 +14,40 @@
 	<BackButton class="ml-10" />
 	<div class="flex flex-col items-center">
 		<h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">My Locker</h1>
-		<Carousel.Root>
+		<Carousel.Root class="w-[400px]">
 			<Carousel.Content>
-				{#each data.requests as request}
+				{#each data.myLockerData.requests as request}
 					<Carousel.Item>
 						<Card.Root class="mt-10 flex h-[600px] w-[400px] items-center justify-center">
 							<Card.Content class="flex h-full w-fit flex-col items-center justify-between">
 								<div class="flex items-center gap-2">
-									<div class="size-4 rounded-full bg-orange-500"></div>
-									<p>Pending</p>
+									{#if request.status === 'pending'}
+										<div class="size-4 rounded-full bg-orange-500"></div>
+										<p>Pending</p>
+									{:else if request.status === 'denied'}
+										<div class="size-4 rounded-full bg-red-500"></div>
+										<p>Denied</p>
+									{:else}
+										<div class="size-4 rounded-full bg-green-500"></div>
+										<p>Approved</p>
+									{/if}
 									<Tooltip.Provider>
 										<Tooltip.Root>
 											<Tooltip.Trigger
-												><CircleHelp class="text-muted-foreground" size={16} /></Tooltip.Trigger
+												><Question
+													class="text-muted-foreground"
+													size={16}
+													weight="bold"
+												/></Tooltip.Trigger
 											>
-											<Tooltip.Content>
-												<p>Your locker request is awaiting review from a school administrator!</p>
+											<Tooltip.Content class="w-[300px]">
+												{#if request.status === 'pending'}
+													<p>Your locker request is pending review from a school administrator!</p>
+												{:else if request.status === 'denied'}
+													<p>Your locker request has been denied!</p>
+												{:else}
+													<p>Your locker request has been approved!</p>
+												{/if}
 											</Tooltip.Content>
 										</Tooltip.Root>
 									</Tooltip.Provider>

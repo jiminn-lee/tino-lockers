@@ -31,7 +31,7 @@ export const singleRequestColumns: ColumnDef<Request>[] = [
 	},
 	{
 		accessorKey: 'date_modified',
-		header: 'Date',
+		header: 'Date, Time',
 		cell: ({ row }) => {
 			const formatter = new Intl.DateTimeFormat('en-US', {
 				year: 'numeric',

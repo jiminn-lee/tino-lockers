@@ -2,6 +2,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { authClient } from '$lib/auth/auth-client';
 	import { Badge } from '$lib/components/ui/badge';
+	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 
 	import {
 		Lockers,

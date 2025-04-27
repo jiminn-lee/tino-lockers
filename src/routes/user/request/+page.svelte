@@ -6,12 +6,26 @@
 	import * as ToggleGroup from '$lib/components/ui/toggle-group/index.js';
 	import { Input } from '$lib/components/ui/input';
 	import ScrollArea from '$lib/components/ui/scroll-area/scroll-area.svelte';
-	import { partnerLockerRequestFormSchema, singleLockerRequestFormSchema } from '$lib/form-schema';
-	import { superForm } from 'sveltekit-superforms';
+	import {
+		partnerLockerRequestFormSchema,
+		singleLockerRequestFormSchema,
+		type PartnerLockerRequestFormSchema,
+		type SingleLockerRequestFormSchema
+	} from '$lib/form-schema';
+	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import BackButton from '$lib/components/BackButton.svelte';
+	import type { PageProps } from './$types';
+	import { CheckCircle } from 'phosphor-svelte';
 
-	let { data } = $props();
+	let {
+		data
+	}: PageProps & {
+		data: {
+			singleForm: SuperValidated<Infer<SingleLockerRequestFormSchema>>;
+			partnerForm: SuperValidated<Infer<PartnerLockerRequestFormSchema>>;
+		};
+	} = $props();
 
 	const singleForm = superForm(data.singleForm, {
 		validators: zodClient(singleLockerRequestFormSchema),
@@ -42,7 +56,7 @@
 	$inspect(data);
 </script>
 
-<main class="mt-10 flex flex-col gap-10">
+<main class="my-10 flex flex-col gap-10">
 	<BackButton class="ml-10" />
 	<div class="flex flex-col items-center">
 		<h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">Request a Locker</h1>
@@ -119,7 +133,7 @@
 										$singleFormData.requested_locker_id = v;
 									}}
 								>
-									{#each data.singleLockers as singleLocker}
+									{#each data.lockersData.singleLockers as singleLocker}
 										{#if singleLocker.available === false}
 											<ToggleGroup.Item value={singleLocker.id} disabled
 												>{singleLocker.id}</ToggleGroup.Item
@@ -134,7 +148,18 @@
 						<Form.FieldErrors />
 						<input name="requested_locker_id" hidden value={$singleFormData.requested_locker_id} />
 					</Form.Field>
-					<Form.Button class="ml-auto">Submit</Form.Button>
+					{#if data.myLockerData.requests[0].status === 'pending'}
+						<p class="text-center text-muted-foreground">
+							You already have a pending locker request! Please wait until your request is reviewed
+							by an administrator
+						</p>
+					{:else if data.myLockerData.requests[0].status === 'approved'}
+						<p class="text-center text-muted-foreground">
+							You already have an approved locker! Contact an administrator if you want a new one!
+						</p>
+					{:else}
+						<Form.Button class="ml-auto"><CheckCircle weight="bold" />Submit</Form.Button>
+					{/if}
 				</form>
 			</Tabs.Content>
 			<Tabs.Content value="partner">

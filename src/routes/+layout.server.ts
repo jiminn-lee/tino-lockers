@@ -11,7 +11,9 @@ export const load: LayoutServerLoad = async ({ request, fetch }) => {
 		const lockersRes = await fetch('/api/lockers');
 		if (lockersRes.status === 200) {
 			lockersData = lockersRes.json();
-			return lockersData;
+			return {
+				lockersData: await lockersData
+			};
 		} else {
 			error(lockersRes.status, lockersRes.statusText);
 		}
