@@ -11,29 +11,29 @@ import { singleLockerRequestFormSchema, partnerLockerRequestFormSchema } from '$
 import { auth } from '$lib/auth/auth';
 
 interface BaseRequest {
-  id: number;
-  user_id: string;
-  status: 'pending' | 'approved' | 'denied';
-  date_modified: Date;
-  requested_locker_id: string | null;
-  comments: string | null;
+	id: number;
+	user_id: string;
+	status: 'pending' | 'approved' | 'denied';
+	date_modified: Date;
+	requested_locker_id: string | null;
+	comments: string | null;
 }
 
 interface SingleLockerRequest extends BaseRequest {
-  type: 'single';
-  name: string;
-  grade: number;
-  student_id: string;
+	type: 'single';
+	name: string;
+	grade: number;
+	student_id: string;
 }
 
 interface PartnerLockerRequest extends BaseRequest {
-  type: 'partner';
-  primary_name: string;
-  primary_grade: number;
-  primary_student_id: string;
-  secondary_name: string;
-  secondary_grade: number;
-  secondary_student_id: string;
+	type: 'partner';
+	primary_name: string;
+	primary_grade: number;
+	primary_student_id: string;
+	secondary_name: string;
+	secondary_grade: number;
+	secondary_student_id: string;
 }
 
 export async function POST({ request }: RequestEvent) {
@@ -69,7 +69,8 @@ export async function POST({ request }: RequestEvent) {
 						comments: null
 					});
 
-					await tx.update(singleLockers)
+					await tx
+						.update(singleLockers)
 						.set({ available: false })
 						.where(eq(singleLockers.id, data.requested_locker_id));
 				});
@@ -112,7 +113,8 @@ export async function POST({ request }: RequestEvent) {
 						comments: null
 					});
 
-					await tx.update(partnerLockers)
+					await tx
+						.update(partnerLockers)
 						.set({ available: false })
 						.where(eq(partnerLockers.id, data.requested_locker_id));
 				});
@@ -162,10 +164,13 @@ export async function GET({ request }: RequestEvent) {
 			.where(eq(partnerLockersRequests.user_id, session.user.id));
 
 		const allRequests = [
-			...singleLockerRequests.map(req => ({ ...req, type: 'single' })),
-			...partnerLockerRequests.map(req => ({ ...req, type: 'partner' }))
+			...singleLockerRequests.map((req) => ({ ...req, type: 'single' })),
+			...partnerLockerRequests.map((req) => ({ ...req, type: 'partner' }))
 		].sort((a, b) => {
-			return new Date(b.date_modified ?? new Date()).getTime() - new Date(a.date_modified ?? new Date()).getTime();
+			return (
+				new Date(b.date_modified ?? new Date()).getTime() -
+				new Date(a.date_modified ?? new Date()).getTime()
+			);
 		});
 
 		const singleLocker = await db

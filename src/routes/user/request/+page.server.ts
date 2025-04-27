@@ -4,12 +4,26 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { partnerLockerRequestFormSchema, singleLockerRequestFormSchema } from '$lib/form-schema';
 import { error } from 'console';
 import { redirect } from '@sveltejs/kit';
+import { auth } from '$lib/auth/auth';
 
-export const load: PageServerLoad = async () => {
-	return {
-		singleForm: await superValidate(zod(singleLockerRequestFormSchema)),
-		partnerForm: await superValidate(zod(partnerLockerRequestFormSchema))
-	};
+export const load: PageServerLoad = async ({ request, fetch }) => {
+	const session = await auth.api.getSession({
+		headers: request.headers
+	});
+	if (session) {
+		let myLockerData = null;
+		const myLockerRes = await fetch('/api/user');
+		if (myLockerRes.status === 200) {
+			myLockerData = myLockerRes.json();
+			return {
+				myLockerData: await myLockerData,
+				singleForm: await superValidate(zod(singleLockerRequestFormSchema)),
+				partnerForm: await superValidate(zod(partnerLockerRequestFormSchema))
+			};
+		} else {
+			error(myLockerRes.status, myLockerRes.statusText);
+		}
+	}
 };
 
 export const actions = {
