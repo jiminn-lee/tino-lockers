@@ -6,16 +6,10 @@
 	import * as ToggleGroup from '$lib/components/ui/toggle-group/index.js';
 	import { Input } from '$lib/components/ui/input';
 	import ScrollArea from '$lib/components/ui/scroll-area/scroll-area.svelte';
-	import {
-		partnerLockerRequestFormSchema,
-		singleLockerRequestFormSchema,
-		type PartnerLockerRequestFormSchema,
-		type SingleLockerRequestFormSchema
-	} from '$lib/form-schema';
-	import { type SuperValidated, type Infer, superForm } from 'sveltekit-superforms';
+	import { partnerLockerRequestFormSchema, singleLockerRequestFormSchema } from '$lib/form-schema';
+	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import type { PageProps } from '../../$types';
-	import { CircleArrowLeft } from 'lucide-svelte';
+	import BackButton from '$lib/components/BackButton.svelte';
 
 	let { data } = $props();
 
@@ -49,11 +43,7 @@
 </script>
 
 <main class="mt-10 flex flex-col gap-10">
-	<a href="/" class="ml-10">
-		<p class="flex items-center gap-2 text-muted-foreground hover:underline">
-			<CircleArrowLeft size={20} />Back
-		</p>
-	</a>
+	<BackButton class="ml-10" />
 	<div class="flex flex-col items-center">
 		<h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">Request a Locker</h1>
 		<Tabs.Root value="single" class="mt-10 w-[400px]">

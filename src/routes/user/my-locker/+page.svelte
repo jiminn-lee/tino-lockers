@@ -4,17 +4,14 @@
 	import * as Card from '$lib/components/ui/card/index.js';
 	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 	import * as Carousel from '$lib/components/ui/carousel/index.js';
+	import BackButton from '$lib/components/BackButton.svelte';
 	let { data } = $props();
 
 	$inspect(data);
 </script>
 
 <main class="mt-10 flex flex-col gap-10">
-	<a href="/" class="ml-10">
-		<p class="flex items-center gap-2 text-muted-foreground hover:underline">
-			<CircleArrowLeft size={20} />Back
-		</p>
-	</a>
+	<BackButton class="ml-10" />
 	<div class="flex flex-col items-center">
 		<h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">My Locker</h1>
 		<Carousel.Root>

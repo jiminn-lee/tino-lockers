@@ -1,16 +1,18 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
-	import {
-		CirclePlus,
-		KeyRound,
-		LayoutDashboard,
-		LogIn,
-		LogOut,
-		ShieldUser,
-		User
-	} from 'lucide-svelte';
 	import { authClient } from '$lib/auth/auth-client';
 	import { Badge } from '$lib/components/ui/badge';
+
+	import {
+		Lockers,
+		SignOut,
+		Student,
+		FilePlus,
+		Key,
+		Shield,
+		ClipboardText,
+		GoogleLogo
+	} from 'phosphor-svelte';
 
 	const session = authClient.useSession();
 </script>
@@ -22,9 +24,9 @@
 				Logged in as <strong>{$session.data.user.name}</strong>
 			</p>
 			{#if $session.data?.user.role === 'user'}
-				<Badge variant="secondary"><User size={14} class="mr-1" />Student</Badge>
+				<Badge variant="secondary"><Student size={14} class="mr-1" />Student</Badge>
 			{:else if $session.data?.user?.role === 'admin'}
-				<Badge variant="secondary"><ShieldUser size={14} class="mr-1" />Admin</Badge>
+				<Badge variant="secondary"><Shield weight="bold" class="mr-1" />Admin</Badge>
 			{/if}
 		</div>
 	{/if}
@@ -42,17 +44,17 @@
 	{#if $session.data}
 		<div class="flex gap-2">
 			{#if $session.data.user?.role === 'user'}
-				<Button href="/user/request"><CirclePlus /> Request a locker</Button>
-				<Button href="/user/my-locker"><KeyRound /> My locker</Button>
+				<Button href="/user/request"><FilePlus weight="bold" /> Request a locker</Button>
+				<Button href="/user/my-locker"><Key weight="bold" /> My locker</Button>
 			{:else if $session.data.user?.role === 'admin'}
-				<Button href="/admin/lockeres"><LayoutDashboard /> Lockers</Button>
-				<Button href="/admin/requests"><LayoutDashboard /> Requests</Button>
+				<Button href="/admin/lockers"><Lockers weight="bold" /> Lockers</Button>
+				<Button href="/admin/requests"><ClipboardText weight="bold" /> Requests</Button>
 			{/if}
 			<Button
 				variant="outline"
 				onclick={async () => {
 					await authClient.signOut();
-				}}><LogOut /> Sign out</Button
+				}}><SignOut weight="bold" /> Sign out</Button
 			>
 		</div>
 	{:else}
@@ -61,7 +63,7 @@
 				await authClient.signIn.social({
 					provider: 'google'
 				});
-			}}><LogIn /> Sign in with Google</Button
+			}}><GoogleLogo weight="bold" /> Sign in with Google</Button
 		>
 	{/if}
 </main>
