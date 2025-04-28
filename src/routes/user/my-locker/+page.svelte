@@ -9,7 +9,7 @@
 	let { data } = $props();
 </script>
 
-<main class="mt-10 flex flex-col gap-10">
+<main class="my-10 flex flex-col gap-10">
 	<BackButton class="ml-10" />
 	<div class="flex flex-col items-center">
 		<h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">My Locker</h1>
@@ -23,39 +23,48 @@
 						<Carousel.Item>
 							<Card.Root class="mt-10 flex h-[600px] w-[400px] items-center justify-center">
 								<Card.Content class="flex h-full w-fit flex-col items-center justify-between">
-									<div class="flex items-center gap-2">
-										{#if request.status === 'pending'}
-											<div class="size-4 rounded-full bg-orange-500"></div>
-											<p>Pending</p>
-										{:else if request.status === 'denied'}
-											<div class="size-4 rounded-full bg-red-500"></div>
-											<p>Denied</p>
-										{:else}
-											<div class="size-4 rounded-full bg-green-500"></div>
-											<p>Approved</p>
+									<div class="flex flex-col items-center">
+										<div class="flex items-center gap-2">
+											{#if request.status === 'pending'}
+												<div class="size-4 rounded-full bg-orange-500"></div>
+												<p>Pending</p>
+											{:else if request.status === 'denied'}
+												<div class="size-4 rounded-full bg-red-500"></div>
+												<p>Denied</p>
+											{:else}
+												<div class="size-4 rounded-full bg-green-500"></div>
+												<p>Approved</p>
+											{/if}
+											<Tooltip.Provider>
+												<Tooltip.Root>
+													<Tooltip.Trigger
+														><Question
+															class="text-muted-foreground"
+															size={16}
+															weight="bold"
+														/></Tooltip.Trigger
+													>
+													<Tooltip.Content class="w-[300px]">
+														{#if request.status === 'pending'}
+															<p>
+																Your locker request is pending review from a school administrator!
+															</p>
+														{:else if request.status === 'denied'}
+															<p>Your locker request has been denied, please request again!</p>
+														{:else}
+															<p>
+																Your locker request has been approved, this locker is now yours!
+															</p>
+														{/if}
+													</Tooltip.Content>
+												</Tooltip.Root>
+											</Tooltip.Provider>
+										</div>
+										{#if request.comments}
+											<blockquote class="mt-6 border-l-2 pl-6 italic">
+												"{request.comments}" -Admin
+											</blockquote>
 										{/if}
-										<Tooltip.Provider>
-											<Tooltip.Root>
-												<Tooltip.Trigger
-													><Question
-														class="text-muted-foreground"
-														size={16}
-														weight="bold"
-													/></Tooltip.Trigger
-												>
-												<Tooltip.Content class="w-[300px]">
-													{#if request.status === 'pending'}
-														<p>
-															Your locker request is pending review from a school administrator!
-														</p>
-													{:else if request.status === 'denied'}
-														<p>Your locker request has been denied, please request again!</p>
-													{:else}
-														<p>Your locker request has been approved, this locker is now yours!</p>
-													{/if}
-												</Tooltip.Content>
-											</Tooltip.Root>
-										</Tooltip.Provider>
 									</div>
 									<div class="flex flex-col items-center">
 										{#if request.type === 'single'}

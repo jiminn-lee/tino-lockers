@@ -13,6 +13,7 @@ export type Request = {
 	secondary_student_id: number;
 	date_modified: string;
 	requested_locker_id: number;
+	status: string;
 };
 
 export const partnerRequestColumns: ColumnDef<Request>[] = [
@@ -103,12 +104,35 @@ export const partnerRequestColumns: ColumnDef<Request>[] = [
 	},
 	{
 		accessorKey: 'requested_locker_id',
-		header: 'Requested Locker #'
+		header: () => {
+			const snippet = createRawSnippet(() => ({
+				render: () => `<div>Requested<br/>Locker ID</div>`
+			}));
+			return renderSnippet(snippet, '');
+		}
 	},
 	{
 		id: 'actions',
 		cell: ({ row }) => {
-			return renderComponent(DataTableActions, { id: row.original.id });
+			const approvedCellSnippet = createRawSnippet<[string]>(() => {
+				return {
+					render: () => `<div class="text-green-500 text-center">Approved</div>`
+				};
+			});
+
+			const deniedCellSnippet = createRawSnippet<[string]>(() => {
+				return {
+					render: () => `<div class="text-red-500 text-center">Denied</div>`
+				};
+			});
+
+			if (row.original.status === 'approved') {
+				return renderSnippet(approvedCellSnippet, '');
+			} else if (row.original.status === 'denied') {
+				return renderSnippet(deniedCellSnippet, '');
+			} else {
+				return renderComponent(DataTableActions, { id: row.original.id });
+			}
 		}
 	}
 ];

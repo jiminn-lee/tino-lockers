@@ -11,7 +11,7 @@
 	let isApproveDialogOpen = $state(false);
 	let isDenyDialogOpen = $state(false);
 
-	let denyMessage = $state(null);
+	let comments = $state(null);
 
 	const approveRequest = async () => {
 		const approveRequestRes = await fetch('/api/admin', {
@@ -31,7 +31,7 @@
 	const denyRequest = async () => {
 		const denyRequestRes = await fetch('/api/admin', {
 			method: 'PUT',
-			body: JSON.stringify({ id: id, type: 'single', status: 'denied' }),
+			body: JSON.stringify({ id: id, type: 'single', status: 'denied', comments: comments }),
 			headers: {
 				'Content-Type': 'application/json'
 			}
@@ -72,7 +72,7 @@
 			</Dialog.Header>
 			<div class="flex w-full flex-col gap-1.5">
 				<Label>Comments</Label>
-				<Input bind:value={denyMessage} />
+				<Input bind:value={comments} />
 			</div>
 			<Dialog.Footer>
 				<Button onclick={denyRequest}>Confirm</Button>
@@ -80,7 +80,7 @@
 					variant="outline"
 					onclick={() => {
 						isDenyDialogOpen = false;
-						denyMessage = null;
+						comments = null;
 					}}>Cancel</Button
 				>
 			</Dialog.Footer>
