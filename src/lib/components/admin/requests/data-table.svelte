@@ -38,8 +38,6 @@
 		getCoreRowModel: getCoreRowModel(),
 		getPaginationRowModel: getPaginationRowModel()
 	});
-
-	$inspect(data);
 </script>
 
 <div class="mt-5">

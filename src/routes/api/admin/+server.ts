@@ -83,7 +83,7 @@ export async function PUT({ request }: RequestEvent) {
 				await db
 					.update(singleLockers)
 					.set({
-						user_id: requestData.user_id ? String(parseInt(requestData.user_id)) : null,
+						user_id: requestData.user_id,
 						name: requestData.name,
 						grade: requestData.grade,
 						student_id: requestData.student_id,
@@ -120,7 +120,7 @@ export async function PUT({ request }: RequestEvent) {
 				await db
 					.update(partnerLockers)
 					.set({
-						user_id: requestData.user_id ? String(parseInt(requestData.user_id)) : null,
+						user_id: requestData.user_id,
 						primary_name: requestData.primary_name,
 						primary_grade: requestData.primary_grade,
 						primary_student_id: requestData.primary_student_id,

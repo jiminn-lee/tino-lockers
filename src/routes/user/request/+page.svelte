@@ -148,7 +148,7 @@
 						{#if data.myLockerData.requests[0].status === 'pending'}
 							<p class="text-center text-muted-foreground">
 								You already have a pending locker request! Please wait until your request is
-								reviewed by an administrator
+								reviewed by an administrator.
 							</p>
 						{:else if data.myLockerData.requests[0].status === 'approved'}
 							<p class="text-center text-muted-foreground">
@@ -302,7 +302,7 @@
 						{#if data.myLockerData.requests[0].status === 'pending'}
 							<p class="text-center text-muted-foreground">
 								You already have a pending locker request! Please wait until your request is
-								reviewed by an administrator
+								reviewed by an administrator.
 							</p>
 						{:else if data.myLockerData.requests[0].status === 'approved'}
 							<p class="text-center text-muted-foreground">

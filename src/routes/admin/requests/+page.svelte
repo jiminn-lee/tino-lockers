@@ -7,7 +7,6 @@
 	import { User, Users } from 'phosphor-svelte';
 
 	let { data } = $props();
-	$inspect(data);
 </script>
 
 <main class="mt-10 flex flex-col gap-10">
