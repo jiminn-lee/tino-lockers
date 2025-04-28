@@ -5,7 +5,6 @@ export const singleLockerRequestFormSchema = z.object({
 	grade: z.enum(['9', '10', '11', '12']),
 	student_id: z
 		.number()
-		.positive()
 		.min(1000000, { message: 'Student ID must be 7 digits' })
 		.max(9999999, { message: 'Student ID must be 7 digits' }),
 	requested_locker_id: z.string().min(1, { message: 'Locker # is required' })
@@ -25,6 +24,6 @@ export const partnerLockerRequestFormSchema = z.object({
 		.number({ invalid_type_error: 'Student ID must be a number' })
 		.min(1000000, { message: 'Student ID must be 7 digits' })
 		.max(9999999, { message: 'Student ID must be 7 digits' }),
-	requested_locker_id: z.number().min(1)
+	requested_locker_id: z.string().min(1, { message: 'Locker # is required' })
 });
 export type PartnerLockerRequestFormSchema = typeof partnerLockerRequestFormSchema;

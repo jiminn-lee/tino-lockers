@@ -53,5 +53,36 @@ export const actions = {
 		} else {
 			return error(requestSingleLockerRes.status, requestSingleLockerRes.statusText);
 		}
+	},
+	requestPartnerLocker: async ({ fetch, request }) => {
+		const form = await superValidate(request, zod(partnerLockerRequestFormSchema));
+
+		if (!form.valid) {
+			console.log(form);
+			return fail(400, { form });
+		}
+
+		const requestPartnerLockerRes = await fetch('/api/user', {
+			method: 'POST',
+			body: JSON.stringify({
+				type: 'partner',
+				primary_name: form.data!.primary_name,
+				primary_grade: form.data!.primary_grade,
+				primary_student_id: form.data!.primary_student_id,
+				secondary_name: form.data!.secondary_name,
+				secondary_grade: form.data!.secondary_grade,
+				secondary_student_id: form.data!.secondary_student_id,
+				requested_locker_id: form.data!.requested_locker_id
+			}),
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		});
+
+		if (requestPartnerLockerRes.status === 200) {
+			redirect(307, '/user/my-locker');
+		} else {
+			return error(requestPartnerLockerRes.status, requestPartnerLockerRes.statusText);
+		}
 	}
 };

@@ -1,6 +1,6 @@
 import { renderComponent, renderSnippet } from '$lib/components/ui/data-table';
 import type { ColumnDef } from '@tanstack/table-core';
-import DataTableActions from './data-table-actions.svelte';
+import DataTableActions from '$lib/components/admin/requests/single/data-table-actions.svelte';
 import { createRawSnippet } from 'svelte';
 
 export type Request = {
@@ -8,8 +8,8 @@ export type Request = {
 	name: string;
 	grade: number;
 	student_id: number;
-	requested_locker_id: number;
 	date_modified: string;
+	requested_locker_id: number;
 };
 
 export const singleRequestColumns: ColumnDef<Request>[] = [
@@ -55,6 +55,10 @@ export const singleRequestColumns: ColumnDef<Request>[] = [
 				formatter.format(new Date(row.getValue('date_modified')))
 			);
 		}
+	},
+	{
+		accessorKey: 'requested_locker_id',
+		header: 'Requested Locker #'
 	},
 	{
 		id: 'actions',

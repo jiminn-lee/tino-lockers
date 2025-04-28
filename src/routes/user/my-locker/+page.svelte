@@ -4,10 +4,9 @@
 	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 	import * as Carousel from '$lib/components/ui/carousel/index.js';
 	import BackButton from '$lib/components/BackButton.svelte';
-	import { Question } from 'phosphor-svelte';
+	import { Question, User, Users } from 'phosphor-svelte';
+	import Separator from '$lib/components/ui/separator/separator.svelte';
 	let { data } = $props();
-
-	$inspect(data);
 </script>
 
 <main class="mt-10 flex flex-col gap-10">
@@ -52,16 +51,38 @@
 										</Tooltip.Root>
 									</Tooltip.Provider>
 								</div>
-								<div>
-									<h2 class="text-8xl font-semibold">#{request.requested_locker_id}</h2>
-									<div class="grid grid-cols-2 gap-x-4 text-muted-foreground">
-										<p class="text-right">Full Name:</p>
-										<p>{request.name}</p>
-										<p class="text-right">Grade:</p>
-										<p>{request.grade}</p>
-										<p class="text-right">Student ID:</p>
-										<p>{request.student_id}</p>
-									</div>
+								<div class="flex flex-col items-center">
+									{#if request.type === 'single'}
+										<h2 class="flex items-center gap-2"><User weight="bold" /> Partner</h2>
+										<h1 class="text-8xl font-semibold">#{request.requested_locker_id}</h1>
+										<Separator />
+										<div class="grid grid-cols-2 gap-x-4 text-muted-foreground">
+											<p class="text-right">Full Name:</p>
+											<p>{request.name}</p>
+											<p class="text-right">Grade:</p>
+											<p>{request.grade}</p>
+											<p class="text-right">Student ID:</p>
+											<p>{request.student_id}</p>
+										</div>
+									{:else if request.type === 'partner'}
+										<h2 class="flex items-center gap-2"><Users weight="bold" /> Partner</h2>
+										<h1 class="text-8xl font-semibold">#{request.requested_locker_id}</h1>
+										<Separator />
+										<div class="mt-5 grid grid-cols-2 gap-x-4 text-muted-foreground">
+											<p class="text-right">Your Name:</p>
+											<p>{request.primary_name}</p>
+											<p class="text-right">Your Grade:</p>
+											<p>{request.primary_grade}</p>
+											<p class="text-right">Your Student ID:</p>
+											<p>{request.primary_student_id}</p>
+											<p class="text-right">Partner Name:</p>
+											<p>{request.secondary_name}</p>
+											<p class="text-right">Partner Grade:</p>
+											<p>{request.secondary_grade}</p>
+											<p class="text-right">Partner Student ID:</p>
+											<p>{request.secondary_student_id}</p>
+										</div>
+									{/if}
 								</div>
 								<div></div>
 							</Card.Content>

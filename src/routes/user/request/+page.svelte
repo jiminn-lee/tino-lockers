@@ -16,7 +16,8 @@
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import BackButton from '$lib/components/BackButton.svelte';
 	import type { PageProps } from './$types';
-	import { CheckCircle } from 'phosphor-svelte';
+	import { CheckCircle, User, Users } from 'phosphor-svelte';
+	import { Separator } from '$lib/components/ui/separator/index.js';
 
 	let {
 		data
@@ -52,8 +53,6 @@
 		}
 	});
 	const { form: partnerFormData, enhance: partnerEnhance } = partnerForm;
-
-	$inspect(data);
 </script>
 
 <main class="my-10 flex flex-col gap-10">
@@ -62,8 +61,8 @@
 		<h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">Request a Locker</h1>
 		<Tabs.Root value="single" class="mt-10 w-[400px]">
 			<Tabs.List class="grid w-full grid-cols-2">
-				<Tabs.Trigger value="single">Single</Tabs.Trigger>
-				<Tabs.Trigger value="partner">Partner</Tabs.Trigger>
+				<Tabs.Trigger value="single"><User weight="bold" class="mr-2" /> Single</Tabs.Trigger>
+				<Tabs.Trigger value="partner"><Users weight="bold" class="mr-2" />Partner</Tabs.Trigger>
 			</Tabs.List>
 			<Tabs.Content value="single">
 				<form
@@ -121,6 +120,7 @@
 						</Form.Control>
 						<Form.FieldErrors />
 					</Form.Field>
+					<Separator />
 					<Form.Field form={singleForm} name="requested_locker_id">
 						<Form.Control>
 							<Form.Label>Choose a locker #</Form.Label>
@@ -134,13 +134,9 @@
 									}}
 								>
 									{#each data.lockersData.singleLockers as singleLocker}
-										{#if singleLocker.available === false}
-											<ToggleGroup.Item value={singleLocker.id} disabled
-												>{singleLocker.id}</ToggleGroup.Item
-											>
-										{:else}
-											<ToggleGroup.Item value={singleLocker.id}>{singleLocker.id}</ToggleGroup.Item>
-										{/if}
+										<ToggleGroup.Item value={singleLocker.id} disabled={!singleLocker.available}
+											>{singleLocker.id}</ToggleGroup.Item
+										>
 									{/each}
 								</ToggleGroup.Root>
 							</ScrollArea>
@@ -151,8 +147,8 @@
 					{#if data.myLockerData.requests?.length > 0}
 						{#if data.myLockerData.requests[0].status === 'pending'}
 							<p class="text-center text-muted-foreground">
-								You already have a pending locker request! Please wait until your request is reviewed
-								by an administrator
+								You already have a pending locker request! Please wait until your request is
+								reviewed by an administrator
 							</p>
 						{:else if data.myLockerData.requests[0].status === 'approved'}
 							<p class="text-center text-muted-foreground">
@@ -165,11 +161,16 @@
 				</form>
 			</Tabs.Content>
 			<Tabs.Content value="partner">
-				<form method="POST" use:partnerEnhance class="mt-4 flex flex-col gap-y-4">
+				<form
+					method="POST"
+					action="?/requestPartnerLocker"
+					use:partnerEnhance
+					class="mt-4 flex flex-col gap-y-4"
+				>
 					<Form.Field form={partnerForm} name="primary_name">
 						<Form.Control>
 							<Form.Label>Your Full Name</Form.Label>
-							<Input bind:value={$partnerFormData.primary_name} />
+							<Input bind:value={$partnerFormData.primary_name} name="primary_name" />
 						</Form.Control>
 						<Form.FieldErrors />
 					</Form.Field>
@@ -210,15 +211,20 @@
 					<Form.Field form={partnerForm} name="primary_student_id">
 						<Form.Control>
 							<Form.Label>Your Student ID</Form.Label>
-							<Input bind:value={$partnerFormData.primary_student_id} />
+							<Input
+								bind:value={$partnerFormData.primary_student_id}
+								type="number"
+								class="[&::-webkit-inner-spin-button]:appearance-none"
+								name="primary_student_id"
+							/>
 						</Form.Control>
 						<Form.FieldErrors />
 					</Form.Field>
-					<hr />
+					<Separator />
 					<Form.Field form={partnerForm} name="secondary_name">
 						<Form.Control>
 							<Form.Label>Partner Full Name</Form.Label>
-							<Input bind:value={$partnerFormData.secondary_name} />
+							<Input bind:value={$partnerFormData.secondary_name} name="secondary_name" />
 						</Form.Control>
 						<Form.FieldErrors />
 					</Form.Field>
@@ -259,12 +265,53 @@
 					<Form.Field form={partnerForm} name="secondary_student_id">
 						<Form.Control>
 							<Form.Label>Partner Student ID</Form.Label>
-							<Input bind:value={$partnerFormData.secondary_student_id} />
+							<Input
+								bind:value={$partnerFormData.secondary_student_id}
+								type="number"
+								class="[&::-webkit-inner-spin-button]:appearance-none"
+								name="secondary_student_id"
+							/>
 						</Form.Control>
 						<Form.FieldErrors />
 					</Form.Field>
-					{#if $delayed}Loading...{/if}
-					<Form.Button class="ml-auto">Submit</Form.Button>
+					<Separator />
+					<Form.Field form={partnerForm} name="requested_locker_id">
+						<Form.Control>
+							<Form.Label>Choose a locker #</Form.Label>
+							<ScrollArea class="h-80 rounded-md border border-input">
+								<ToggleGroup.Root
+									type="single"
+									variant="outline"
+									class="grid grid-cols-6 p-2"
+									onValueChange={(v) => {
+										$partnerFormData.requested_locker_id = v;
+									}}
+								>
+									{#each data.lockersData.partnerLockers as partnerLocker}
+										<ToggleGroup.Item value={partnerLocker.id} disabled={!partnerLocker.available}
+											>{partnerLocker.id}</ToggleGroup.Item
+										>
+									{/each}
+								</ToggleGroup.Root>
+							</ScrollArea>
+						</Form.Control>
+						<Form.FieldErrors />
+						<input name="requested_locker_id" hidden value={$partnerFormData.requested_locker_id} />
+					</Form.Field>
+					{#if data.myLockerData.requests?.length > 0}
+						{#if data.myLockerData.requests[0].status === 'pending'}
+							<p class="text-center text-muted-foreground">
+								You already have a pending locker request! Please wait until your request is
+								reviewed by an administrator
+							</p>
+						{:else if data.myLockerData.requests[0].status === 'approved'}
+							<p class="text-center text-muted-foreground">
+								You already have an approved locker! Contact an administrator if you want a new one!
+							</p>
+						{/if}
+					{:else}
+						<Form.Button class="ml-auto"><CheckCircle weight="bold" />Submit</Form.Button>
+					{/if}
 				</form>
 			</Tabs.Content>
 		</Tabs.Root>
