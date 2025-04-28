@@ -11,18 +11,28 @@ export const load: PageServerLoad = async ({ request, fetch }) => {
 		headers: request.headers
 	});
 	if (session) {
+		let lockersData = null;
+		const lockersRes = await fetch('/api/lockers');
+		if (lockersRes.status === 200) {
+			lockersData = lockersRes.json();
+		} else {
+			error(lockersRes.status, lockersRes.statusText);
+		}
+
 		let myLockerData = null;
 		const myLockerRes = await fetch('/api/user');
 		if (myLockerRes.status === 200) {
 			myLockerData = myLockerRes.json();
-			return {
-				myLockerData: await myLockerData,
-				singleForm: await superValidate(zod(singleLockerRequestFormSchema)),
-				partnerForm: await superValidate(zod(partnerLockerRequestFormSchema))
-			};
 		} else {
 			error(myLockerRes.status, myLockerRes.statusText);
 		}
+
+		return {
+			lockersData: await lockersData,
+			myLockerData: await myLockerData,
+			singleForm: await superValidate(zod(singleLockerRequestFormSchema)),
+			partnerForm: await superValidate(zod(partnerLockerRequestFormSchema))
+		};
 	}
 };
 

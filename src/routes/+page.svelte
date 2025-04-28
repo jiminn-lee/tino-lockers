@@ -18,6 +18,10 @@
 	const session = authClient.useSession();
 </script>
 
+<svelte:head>
+	<title>Tino Lockers</title>
+</svelte:head>
+
 <main class="flex h-lvh select-none flex-col items-center justify-center gap-2">
 	{#if $session.data}
 		<div class="flex items-center gap-2">

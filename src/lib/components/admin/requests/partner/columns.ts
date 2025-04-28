@@ -22,27 +22,57 @@ export const partnerRequestColumns: ColumnDef<Request>[] = [
 	},
 	{
 		accessorKey: 'primary_name',
-		header: 'Primary Name'
+		header: () => {
+			const snippet = createRawSnippet(() => ({
+				render: () => `<div>Primary<br/>Name</div>`
+			}));
+			return renderSnippet(snippet, '');
+		}
 	},
 	{
 		accessorKey: 'primary_grade',
-		header: 'Primary Grade'
+		header: () => {
+			const snippet = createRawSnippet(() => ({
+				render: () => `<div>Primary<br/>Grade</div>`
+			}));
+			return renderSnippet(snippet, '');
+		}
 	},
 	{
 		accessorKey: 'primary_student_id',
-		header: 'Primary Student ID'
+		header: () => {
+			const snippet = createRawSnippet(() => ({
+				render: () => `<div>Primary<br/>Student ID</div>`
+			}));
+			return renderSnippet(snippet, '');
+		}
 	},
 	{
 		accessorKey: 'secondary_name',
-		header: 'Secondary Name'
+		header: () => {
+			const snippet = createRawSnippet(() => ({
+				render: () => `<div>Secondary<br/>Name</div>`
+			}));
+			return renderSnippet(snippet, '');
+		}
 	},
 	{
 		accessorKey: 'secondary_grade',
-		header: 'Secondary Grade'
+		header: () => {
+			const snippet = createRawSnippet(() => ({
+				render: () => `<div>Secondary<br/>Grade</div>`
+			}));
+			return renderSnippet(snippet, '');
+		}
 	},
 	{
 		accessorKey: 'secondary_student_id',
-		header: 'Secondary Student ID'
+		header: () => {
+			const snippet = createRawSnippet(() => ({
+				render: () => `<div>Secondary<br/>Student ID</div>`
+			}));
+			return renderSnippet(snippet, '');
+		}
 	},
 	{
 		accessorKey: 'date_modified',
