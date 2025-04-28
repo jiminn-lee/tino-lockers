@@ -11,7 +11,7 @@
 	let isApproveDialogOpen = $state(false);
 	let isDenyDialogOpen = $state(false);
 
-	let denyMessage = $state('');
+	let denyMessage = $state(null);
 
 	const approveRequest = async () => {
 		const approveRequestRes = await fetch('/api/admin', {
@@ -24,6 +24,21 @@
 		if (approveRequestRes.status === 200) {
 			isApproveDialogOpen = false;
 			toast.success('Request successfully approved!');
+			invalidateAll();
+		}
+	};
+
+	const denyRequest = async () => {
+		const denyRequestRes = await fetch('/api/admin', {
+			method: 'PUT',
+			body: JSON.stringify({ id: id, type: 'single', status: 'denied' }),
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		});
+		if (denyRequestRes.status === 200) {
+			isApproveDialogOpen = false;
+			toast.success('Request successfully denied!');
 			invalidateAll();
 		}
 	};
@@ -60,12 +75,12 @@
 				<Input bind:value={denyMessage} />
 			</div>
 			<Dialog.Footer>
-				<Button>Confirm</Button>
+				<Button onclick={denyRequest}>Confirm</Button>
 				<Button
 					variant="outline"
 					onclick={() => {
 						isDenyDialogOpen = false;
-						denyMessage = '';
+						denyMessage = null;
 					}}>Cancel</Button
 				>
 			</Dialog.Footer>

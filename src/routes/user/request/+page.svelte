@@ -154,6 +154,8 @@
 							<p class="text-center text-muted-foreground">
 								You already have an approved locker! Contact an administrator if you want a new one!
 							</p>
+						{:else}
+							<Form.Button class="ml-auto"><CheckCircle weight="bold" />Submit</Form.Button>
 						{/if}
 					{:else}
 						<Form.Button class="ml-auto"><CheckCircle weight="bold" />Submit</Form.Button>
@@ -308,6 +310,8 @@
 							<p class="text-center text-muted-foreground">
 								You already have an approved locker! Contact an administrator if you want a new one!
 							</p>
+						{:else}
+							<Form.Button class="ml-auto"><CheckCircle weight="bold" />Submit</Form.Button>
 						{/if}
 					{:else}
 						<Form.Button class="ml-auto"><CheckCircle weight="bold" />Submit</Form.Button>

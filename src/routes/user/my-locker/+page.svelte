@@ -90,7 +90,13 @@
 											</div>
 										{/if}
 									</div>
-									<div></div>
+									<div>
+										{#if request.status === 'denied'}
+											<Button href="/user/request"
+												><FilePlus weight="bold" /> Request a locker</Button
+											>
+										{/if}
+									</div>
 								</Card.Content>
 							</Card.Root>
 						</Carousel.Item>
