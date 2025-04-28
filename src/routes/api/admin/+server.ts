@@ -56,8 +56,7 @@ export async function PUT({ request }: RequestEvent) {
 
 		const updateData = {
 			status,
-			comments: comments || null,
-			date_modified: new Date()
+			comments: comments || null
 		};
 
 		if (type === 'single') {
