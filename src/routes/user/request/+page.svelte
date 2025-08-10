@@ -81,25 +81,25 @@
 					<Form.Fieldset form={singleForm} name="grade">
 						<Form.Legend>Grade</Form.Legend>
 						<RadioGroup.Root bind:value={$singleFormData.grade} name="grade" class="flex gap-x-4">
-							<div class="flex items-center space-x-2 space-y-0">
+							<div class="flex items-center space-y-0 space-x-2">
 								<Form.Control>
 									<RadioGroup.Item value="9" />
 									<Form.Label class="font-normal">9</Form.Label>
 								</Form.Control>
 							</div>
-							<div class="flex items-center space-x-2 space-y-0">
+							<div class="flex items-center space-y-0 space-x-2">
 								<Form.Control>
 									<RadioGroup.Item value="10" />
 									<Form.Label class="font-normal">10</Form.Label>
 								</Form.Control>
 							</div>
-							<div class="flex items-center space-x-2 space-y-0">
+							<div class="flex items-center space-y-0 space-x-2">
 								<Form.Control>
 									<RadioGroup.Item value="11" />
 									<Form.Label class="font-normal">11</Form.Label>
 								</Form.Control>
 							</div>
-							<div class="flex items-center space-x-2 space-y-0">
+							<div class="flex items-center space-y-0 space-x-2">
 								<Form.Control>
 									<RadioGroup.Item value="12" />
 									<Form.Label class="font-normal">12</Form.Label>
@@ -124,18 +124,20 @@
 					<Form.Field form={singleForm} name="requested_locker_id">
 						<Form.Control>
 							<Form.Label>Choose a locker #</Form.Label>
-							<ScrollArea class="h-80 rounded-md border border-input">
+							<ScrollArea class="border-input h-80 rounded-md border">
 								<ToggleGroup.Root
 									type="single"
 									variant="outline"
-									class="grid grid-cols-6 p-2"
+									class="grid w-full grid-cols-6 gap-2 p-2"
 									onValueChange={(v) => {
 										$singleFormData.requested_locker_id = v;
 									}}
 								>
 									{#each data.lockersData.singleLockers as singleLocker}
-										<ToggleGroup.Item value={singleLocker.id} disabled={!singleLocker.available}
-											>{singleLocker.id}</ToggleGroup.Item
+										<ToggleGroup.Item
+											value={singleLocker.id}
+											disabled={!singleLocker.available}
+											class="rounded-md">{singleLocker.id}</ToggleGroup.Item
 										>
 									{/each}
 								</ToggleGroup.Root>
@@ -146,12 +148,12 @@
 					</Form.Field>
 					{#if data.myLockerData.requests?.length > 0}
 						{#if data.myLockerData.requests[0].status === 'pending'}
-							<p class="text-center text-muted-foreground">
+							<p class="text-muted-foreground text-center">
 								You already have a pending locker request! Please wait until your request is
 								reviewed by an administrator.
 							</p>
 						{:else if data.myLockerData.requests[0].status === 'approved'}
-							<p class="text-center text-muted-foreground">
+							<p class="text-muted-foreground text-center">
 								You already have an approved locker! Contact an administrator if you want a new one!
 							</p>
 						{:else}
@@ -183,25 +185,25 @@
 							name="primary_grade"
 							class="flex gap-x-4"
 						>
-							<div class="flex items-center space-x-2 space-y-0">
+							<div class="flex items-center space-y-0 space-x-2">
 								<Form.Control>
 									<RadioGroup.Item value="9" />
 									<Form.Label class="font-normal">9</Form.Label>
 								</Form.Control>
 							</div>
-							<div class="flex items-center space-x-2 space-y-0">
+							<div class="flex items-center space-y-0 space-x-2">
 								<Form.Control>
 									<RadioGroup.Item value="10" />
 									<Form.Label class="font-normal">10</Form.Label>
 								</Form.Control>
 							</div>
-							<div class="flex items-center space-x-2 space-y-0">
+							<div class="flex items-center space-y-0 space-x-2">
 								<Form.Control>
 									<RadioGroup.Item value="11" />
 									<Form.Label class="font-normal">11</Form.Label>
 								</Form.Control>
 							</div>
-							<div class="flex items-center space-x-2 space-y-0">
+							<div class="flex items-center space-y-0 space-x-2">
 								<Form.Control>
 									<RadioGroup.Item value="12" />
 									<Form.Label class="font-normal">12</Form.Label>
@@ -237,25 +239,25 @@
 							name="secondary_grade"
 							class="flex gap-x-4"
 						>
-							<div class="flex items-center space-x-2 space-y-0">
+							<div class="flex items-center space-y-0 space-x-2">
 								<Form.Control>
 									<RadioGroup.Item value="9" />
 									<Form.Label class="font-normal">9</Form.Label>
 								</Form.Control>
 							</div>
-							<div class="flex items-center space-x-2 space-y-0">
+							<div class="flex items-center space-y-0 space-x-2">
 								<Form.Control>
 									<RadioGroup.Item value="10" />
 									<Form.Label class="font-normal">10</Form.Label>
 								</Form.Control>
 							</div>
-							<div class="flex items-center space-x-2 space-y-0">
+							<div class="flex items-center space-y-0 space-x-2">
 								<Form.Control>
 									<RadioGroup.Item value="11" />
 									<Form.Label class="font-normal">11</Form.Label>
 								</Form.Control>
 							</div>
-							<div class="flex items-center space-x-2 space-y-0">
+							<div class="flex items-center space-y-0 space-x-2">
 								<Form.Control>
 									<RadioGroup.Item value="12" />
 									<Form.Label class="font-normal">12</Form.Label>
@@ -280,18 +282,20 @@
 					<Form.Field form={partnerForm} name="requested_locker_id">
 						<Form.Control>
 							<Form.Label>Choose a locker #</Form.Label>
-							<ScrollArea class="h-80 rounded-md border border-input">
+							<ScrollArea class="border-input h-80 rounded-md border">
 								<ToggleGroup.Root
 									type="single"
 									variant="outline"
-									class="grid grid-cols-6 p-2"
+									class="grid w-full grid-cols-6 gap-2 p-2"
 									onValueChange={(v) => {
 										$partnerFormData.requested_locker_id = v;
 									}}
 								>
 									{#each data.lockersData.partnerLockers as partnerLocker}
-										<ToggleGroup.Item value={partnerLocker.id} disabled={!partnerLocker.available}
-											>{partnerLocker.id}</ToggleGroup.Item
+										<ToggleGroup.Item
+											value={partnerLocker.id}
+											disabled={!partnerLocker.available}
+											class="rounded-md">{partnerLocker.id}</ToggleGroup.Item
 										>
 									{/each}
 								</ToggleGroup.Root>
@@ -302,12 +306,12 @@
 					</Form.Field>
 					{#if data.myLockerData.requests?.length > 0}
 						{#if data.myLockerData.requests[0].status === 'pending'}
-							<p class="text-center text-muted-foreground">
+							<p class="text-muted-foreground text-center">
 								You already have a pending locker request! Please wait until your request is
 								reviewed by an administrator.
 							</p>
 						{:else if data.myLockerData.requests[0].status === 'approved'}
-							<p class="text-center text-muted-foreground">
+							<p class="text-muted-foreground text-center">
 								You already have an approved locker! Contact an administrator if you want a new one!
 							</p>
 						{:else}
