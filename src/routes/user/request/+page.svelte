@@ -28,6 +28,8 @@
 		};
 	} = $props();
 
+	$inspect(data);
+
 	const singleForm = superForm(data.singleForm, {
 		validators: zodClient(singleLockerRequestFormSchema),
 		onUpdate: ({ form: f }) => {
@@ -146,7 +148,12 @@
 						<Form.FieldErrors />
 						<input name="requested_locker_id" hidden value={$singleFormData.requested_locker_id} />
 					</Form.Field>
-					{#if data.myLockerData.requests?.length > 0}
+					{#if !data.acceptingRequestsData.accepting_responses}
+						<p class="text-muted-foreground text-center">
+							Sorry! We are currently not accepting locker requests. Contact an administrator if you
+							need one!
+						</p>
+					{:else if data.myLockerData.requests?.length > 0}
 						{#if data.myLockerData.requests[0].status === 'pending'}
 							<p class="text-muted-foreground text-center">
 								You already have a pending locker request! Please wait until your request is
@@ -304,7 +311,12 @@
 						<Form.FieldErrors />
 						<input name="requested_locker_id" hidden value={$partnerFormData.requested_locker_id} />
 					</Form.Field>
-					{#if data.myLockerData.requests?.length > 0}
+					{#if !data.acceptingRequestsData.accepting_responses}
+						<p class="text-muted-foreground text-center">
+							Sorry! We are currently not accepting locker requests. Contact an administrator if you
+							need one!
+						</p>
+					{:else if data.myLockerData.requests?.length > 0}
 						{#if data.myLockerData.requests[0].status === 'pending'}
 							<p class="text-muted-foreground text-center">
 								You already have a pending locker request! Please wait until your request is

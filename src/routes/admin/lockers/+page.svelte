@@ -1,15 +1,17 @@
-<script>
+<script lang="ts">
 	import * as Card from '$lib/components/ui/card/index.js';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import BackButton from '$lib/components/BackButton.svelte';
 	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
 	import { Check, Eraser, User, Users, X } from 'phosphor-svelte';
-	import { cn } from '$lib/utils.js';
+	import { invalidateAll } from '$app/navigation';
 
 	let { data } = $props();
 	let selectedTab = $state('single');
-
-	$inspect(data);
+	let isSingleLockerDialogOpen: boolean[] = $state(data.lockersData.singleLockers.map(() => false));
+	let isPartnerLockerDialogOpen: boolean[] = $state(
+		data.lockersData.partnerLockers.map(() => false)
+	);
 </script>
 
 <main class="mt-10 flex flex-col gap-10">
@@ -54,7 +56,7 @@
 		</div>
 		<div class="mb-5 flex flex-wrap justify-center gap-4">
 			{#if selectedTab === 'single'}
-				{#each data.lockersData.singleLockers as locker}
+				{#each data.lockersData.singleLockers as locker, index}
 					<Card.Root
 						class={locker.available
 							? 'aspect-square size-[180px] border-green-900'
@@ -69,39 +71,83 @@
 						<Card.Header class="flex justify-between">
 							<Card.Title class="text-3xl">{locker.id}</Card.Title>
 							{#if locker.available}
-								<Dialog.Root>
+								<Dialog.Root bind:open={isSingleLockerDialogOpen[index]}>
 									<Dialog.Trigger class={buttonVariants({ variant: 'outline', size: 'icon' })}
 										><X weight="bold" /></Dialog.Trigger
 									>
 									<Dialog.Content>
 										<Dialog.Header>
 											<Dialog.Title>Mark locker as unavailable/broken?</Dialog.Title>
-											<Dialog.Description>This action cannot be undone.</Dialog.Description>
 										</Dialog.Header>
 										<Dialog.Footer>
-											<Button>Confirm</Button>
-											<Button variant="secondary">Cancel</Button>
+											<Button
+												onclick={async () => {
+													fetch('/api/admin', {
+														method: 'PUT',
+														body: JSON.stringify({
+															action: 'markUnavailable',
+															lockerId: locker.id,
+															type: 'single'
+														}),
+														headers: {
+															'Content-Type': 'application/json'
+														}
+													});
+													isSingleLockerDialogOpen[index] = false;
+													invalidateAll();
+												}}>Confirm</Button
+											>
+											<Button
+												variant="secondary"
+												onclick={() => {
+													isSingleLockerDialogOpen[index] = false;
+												}}>Cancel</Button
+											>
 										</Dialog.Footer>
 									</Dialog.Content>
 								</Dialog.Root>
 							{:else if !locker.available && locker.name && locker.student_id}
-								<Dialog.Root>
+								<Dialog.Root bind:open={isSingleLockerDialogOpen[index]}>
 									<Dialog.Trigger class={buttonVariants({ variant: 'outline', size: 'icon' })}
 										><Eraser weight="bold" /></Dialog.Trigger
 									>
 									<Dialog.Content>
 										<Dialog.Header>
 											<Dialog.Title>Clear locker?</Dialog.Title>
-											<Dialog.Description>This action cannot be undone.</Dialog.Description>
+											<Dialog.Description
+												>This action cannot be undone. This will clear all student data and mark the
+												locker as vacant.</Dialog.Description
+											>
 										</Dialog.Header>
 										<Dialog.Footer>
-											<Button>Confirm</Button>
-											<Button variant="secondary">Cancel</Button>
+											<Button
+												onclick={async () => {
+													fetch('/api/admin', {
+														method: 'PUT',
+														body: JSON.stringify({
+															action: 'clearLocker',
+															lockerId: locker.id,
+															type: 'single'
+														}),
+														headers: {
+															'Content-Type': 'application/json'
+														}
+													});
+													isSingleLockerDialogOpen[index] = false;
+													invalidateAll();
+												}}>Confirm</Button
+											>
+											<Button
+												variant="secondary"
+												onclick={() => {
+													isSingleLockerDialogOpen[index] = false;
+												}}>Cancel</Button
+											>
 										</Dialog.Footer>
 									</Dialog.Content>
 								</Dialog.Root>
 							{:else if !locker.available && locker.name === 'N/A' && !locker.student_id}
-								<Dialog.Root>
+								<Dialog.Root bind:open={isSingleLockerDialogOpen[index]}>
 									<Dialog.Trigger class={buttonVariants({ variant: 'outline', size: 'icon' })}
 										><Check weight="bold" /></Dialog.Trigger
 									>
@@ -110,8 +156,29 @@
 											<Dialog.Title>Mark locker as available?</Dialog.Title>
 										</Dialog.Header>
 										<Dialog.Footer>
-											<Button>Confirm</Button>
-											<Button variant="secondary">Cancel</Button>
+											<Button
+												onclick={async () => {
+													fetch('/api/admin', {
+														method: 'PUT',
+														body: JSON.stringify({
+															action: 'markAvailable',
+															lockerId: locker.id,
+															type: 'single'
+														}),
+														headers: {
+															'Content-Type': 'application/json'
+														}
+													});
+													isSingleLockerDialogOpen[index] = false;
+													invalidateAll();
+												}}>Confirm</Button
+											>
+											<Button
+												variant="secondary"
+												onclick={() => {
+													isSingleLockerDialogOpen[index] = false;
+												}}>Cancel</Button
+											>
 										</Dialog.Footer>
 									</Dialog.Content>
 								</Dialog.Root>
@@ -131,7 +198,7 @@
 					</Card.Root>
 				{/each}
 			{:else if selectedTab === 'partner'}
-				{#each data.lockersData.partnerLockers as locker}
+				{#each data.lockersData.partnerLockers as locker, index}
 					<Card.Root
 						class={locker.available
 							? 'h-[280px] w-[180px] border-green-900'
@@ -146,7 +213,7 @@
 						<Card.Header class="flex justify-between">
 							<Card.Title class="text-3xl">{locker.id}</Card.Title>
 							{#if locker.available}
-								<Dialog.Root>
+								<Dialog.Root bind:open={isPartnerLockerDialogOpen[index]}>
 									<Dialog.Trigger class={buttonVariants({ variant: 'outline', size: 'icon' })}
 										><X weight="bold" /></Dialog.Trigger
 									>
@@ -155,29 +222,74 @@
 											<Dialog.Title>Mark locker as unavailable/broken?</Dialog.Title>
 										</Dialog.Header>
 										<Dialog.Footer>
-											<Button>Confirm</Button>
-											<Button variant="secondary">Cancel</Button>
+											<Button
+												onclick={async () => {
+													fetch('/api/admin', {
+														method: 'PUT',
+														body: JSON.stringify({
+															action: 'markUnavailable',
+															lockerId: locker.id,
+															type: 'partner'
+														}),
+														headers: {
+															'Content-Type': 'application/json'
+														}
+													});
+													isPartnerLockerDialogOpen[index] = false;
+													invalidateAll();
+												}}>Confirm</Button
+											>
+											<Button
+												variant="secondary"
+												onclick={() => {
+													isPartnerLockerDialogOpen[index] = false;
+												}}>Cancel</Button
+											>
 										</Dialog.Footer>
 									</Dialog.Content>
 								</Dialog.Root>
 							{:else if !locker.available && locker.primary_name && locker.primary_student_id}
-								<Dialog.Root>
+								<Dialog.Root bind:open={isPartnerLockerDialogOpen[index]}>
 									<Dialog.Trigger class={buttonVariants({ variant: 'outline', size: 'icon' })}
 										><Eraser weight="bold" /></Dialog.Trigger
 									>
 									<Dialog.Content>
 										<Dialog.Header>
 											<Dialog.Title>Clear locker?</Dialog.Title>
-											<Dialog.Description>This action cannot be undone.</Dialog.Description>
+											<Dialog.Description
+												>This action cannot be undone. This will clear all student data and mark the
+												locker as vacant.</Dialog.Description
+											>
 										</Dialog.Header>
 										<Dialog.Footer>
-											<Button>Confirm</Button>
-											<Button variant="secondary">Cancel</Button>
+											<Button
+												onclick={async () => {
+													fetch('/api/admin', {
+														method: 'PUT',
+														body: JSON.stringify({
+															action: 'clearLocker',
+															lockerId: locker.id,
+															type: 'partner'
+														}),
+														headers: {
+															'Content-Type': 'application/json'
+														}
+													});
+													isPartnerLockerDialogOpen[index] = false;
+													invalidateAll();
+												}}>Confirm</Button
+											>
+											<Button
+												variant="secondary"
+												onclick={() => {
+													isPartnerLockerDialogOpen[index] = false;
+												}}>Cancel</Button
+											>
 										</Dialog.Footer>
 									</Dialog.Content>
 								</Dialog.Root>
 							{:else if !locker.available && locker.primary_name === 'N/A' && !locker.primary_student_id}
-								<Dialog.Root>
+								<Dialog.Root bind:open={isPartnerLockerDialogOpen[index]}>
 									<Dialog.Trigger class={buttonVariants({ variant: 'outline', size: 'icon' })}
 										><Check weight="bold" /></Dialog.Trigger
 									>
@@ -186,8 +298,29 @@
 											<Dialog.Title>Mark locker as available?</Dialog.Title>
 										</Dialog.Header>
 										<Dialog.Footer>
-											<Button>Confirm</Button>
-											<Button variant="secondary">Cancel</Button>
+											<Button
+												onclick={async () => {
+													fetch('/api/admin', {
+														method: 'PUT',
+														body: JSON.stringify({
+															action: 'markAvailable',
+															lockerId: locker.id,
+															type: 'partner'
+														}),
+														headers: {
+															'Content-Type': 'application/json'
+														}
+													});
+													isPartnerLockerDialogOpen[index] = false;
+													invalidateAll();
+												}}>Confirm</Button
+											>
+											<Button
+												variant="secondary"
+												onclick={() => {
+													isPartnerLockerDialogOpen[index] = false;
+												}}>Cancel</Button
+											>
 										</Dialog.Footer>
 									</Dialog.Content>
 								</Dialog.Root>

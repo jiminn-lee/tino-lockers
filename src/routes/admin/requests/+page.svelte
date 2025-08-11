@@ -9,6 +9,7 @@
 	import { User, Users } from 'phosphor-svelte';
 
 	let { data } = $props();
+	let isAcceptingRequests = $state(data.acceptingRequestsData.accepting_responses);
 </script>
 
 <main class="mt-10 flex flex-col gap-10">
@@ -19,7 +20,22 @@
 			class="bg-card text-card-foreground mt-10 mb-5 flex w-[500px] flex-row items-center justify-between rounded-xl border p-4 shadow-sm"
 		>
 			<h1 class="leading-none font-semibold">Accepting requests</h1>
-			<Switch />
+			<Switch
+				checked={isAcceptingRequests}
+				onCheckedChange={async () => {
+					fetch('/api/admin', {
+						method: 'PUT',
+						body: JSON.stringify({
+							action: 'toggleAcceptingResponses',
+							value: isAcceptingRequests
+						}),
+						headers: {
+							'Content-Type': 'application/json'
+						}
+					});
+					isAcceptingRequests = !isAcceptingRequests;
+				}}
+			/>
 		</div>
 		<Tabs.Root value="single">
 			<Tabs.List class="grid w-full grid-cols-2">

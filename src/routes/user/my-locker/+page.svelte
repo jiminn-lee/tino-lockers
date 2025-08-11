@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
@@ -6,6 +6,7 @@
 	import BackButton from '$lib/components/BackButton.svelte';
 	import { FilePlus, Question, User, Users } from 'phosphor-svelte';
 	import Separator from '$lib/components/ui/separator/separator.svelte';
+
 	let { data } = $props();
 </script>
 
@@ -62,7 +63,7 @@
 										</div>
 										{#if request.comments}
 											<blockquote class="mt-6 border-l-2 pl-6 italic">
-												"{request.comments}" -Admin
+												"{request.comments}" - Admin
 											</blockquote>
 										{/if}
 									</div>

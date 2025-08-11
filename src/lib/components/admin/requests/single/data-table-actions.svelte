@@ -70,10 +70,10 @@
 				<Dialog.Title>Deny locker request?</Dialog.Title>
 				<Dialog.Description>This action cannot be undone.</Dialog.Description>
 			</Dialog.Header>
-			<!-- <div class="flex w-full flex-col gap-1.5">
-				<Label>Comments</Label>
+			<div class="flex w-full flex-col gap-1.5">
+				<Label>Comments (optional)</Label>
 				<Input bind:value={comments} />
-			</div> -->
+			</div>
 			<Dialog.Footer>
 				<Button onclick={denyRequest}>Confirm</Button>
 				<Button

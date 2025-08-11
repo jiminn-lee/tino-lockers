@@ -1,8 +1,8 @@
 import { auth } from '$lib/auth/auth';
 import { error } from '@sveltejs/kit';
-import type { LayoutServerLoad } from '../../$types';
+import type { PageServerLoad } from './$types';
 
-export const load: LayoutServerLoad = async ({ request, fetch }) => {
+export const load: PageServerLoad = async ({ request, fetch }) => {
 	const session = await auth.api.getSession({
 		headers: request.headers
 	});
@@ -11,11 +11,20 @@ export const load: LayoutServerLoad = async ({ request, fetch }) => {
 		const requestsRes = await fetch('/api/admin');
 		if (requestsRes.status === 200) {
 			requestsData = requestsRes.json();
-			return {
-				requestsData: await requestsData
-			};
 		} else {
 			error(requestsRes.status, requestsRes.statusText);
 		}
+
+		let acceptingRequestsData = null;
+		const acceptingRequestsRes = await fetch('/api/user?accepting=true');
+		if (acceptingRequestsRes.status === 200) {
+			acceptingRequestsData = acceptingRequestsRes.json();
+		} else {
+			error(acceptingRequestsRes.status, acceptingRequestsRes.statusText);
+		}
+		return {
+			requestsData: await requestsData,
+			acceptingRequestsData: await acceptingRequestsData
+		};
 	}
 };
