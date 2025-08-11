@@ -47,3 +47,8 @@ export const partnerLockersRequests = pgTable('partnerLockersRequests', {
 	date_modified: timestamp().defaultNow(),
 	comments: text()
 });
+
+export const settings = pgTable('settings', {
+	id: varchar().primaryKey(),
+	accepting_responses: boolean().notNull().default(true)
+});
