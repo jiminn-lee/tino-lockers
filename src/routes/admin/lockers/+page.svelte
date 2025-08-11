@@ -32,7 +32,9 @@
 				}}><Users weight="bold" />Partner</Button
 			>
 		</div>
-		<div class="sticky top-0 flex gap-8 rounded-b-3xl bg-zinc-950 p-5">
+		<div
+			class="sticky top-0 flex flex-wrap justify-center gap-x-8 gap-y-4 rounded-b-3xl bg-zinc-950 p-5"
+		>
 			<div class="text-muted-foreground flex items-center text-sm">
 				<div class="mr-2 size-4 rounded-full bg-green-900"></div>
 				Vacant
@@ -73,7 +75,7 @@
 									>
 									<Dialog.Content>
 										<Dialog.Header>
-											<Dialog.Title>Mark locker as unavailable?</Dialog.Title>
+											<Dialog.Title>Mark locker as unavailable/broken?</Dialog.Title>
 											<Dialog.Description>This action cannot be undone.</Dialog.Description>
 										</Dialog.Header>
 										<Dialog.Footer>
@@ -106,7 +108,6 @@
 									<Dialog.Content>
 										<Dialog.Header>
 											<Dialog.Title>Mark locker as available?</Dialog.Title>
-											<Dialog.Description>This action cannot be undone.</Dialog.Description>
 										</Dialog.Header>
 										<Dialog.Footer>
 											<Button>Confirm</Button>
@@ -151,8 +152,7 @@
 									>
 									<Dialog.Content>
 										<Dialog.Header>
-											<Dialog.Title>Mark locker as unavailable?</Dialog.Title>
-											<Dialog.Description>This action cannot be undone.</Dialog.Description>
+											<Dialog.Title>Mark locker as unavailable/broken?</Dialog.Title>
 										</Dialog.Header>
 										<Dialog.Footer>
 											<Button>Confirm</Button>
@@ -184,7 +184,6 @@
 									<Dialog.Content>
 										<Dialog.Header>
 											<Dialog.Title>Mark locker as available?</Dialog.Title>
-											<Dialog.Description>This action cannot be undone.</Dialog.Description>
 										</Dialog.Header>
 										<Dialog.Footer>
 											<Button>Confirm</Button>

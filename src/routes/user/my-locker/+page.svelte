@@ -14,14 +14,14 @@
 	<div class="flex flex-col items-center">
 		<h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">My Locker</h1>
 		{#if data.myLockerData.requests.length === 0}
-			<div class="mb-5 mt-20 text-3xl font-semibold">You haven't requested any locker yet!</div>
+			<div class="mt-20 mb-5 text-3xl font-semibold">You haven't requested any locker yet!</div>
 			<Button href="/user/request"><FilePlus weight="bold" /> Request a locker</Button>
 		{:else}
-			<Carousel.Root class="w-[400px]">
+			<Carousel.Root class="w-[350px]">
 				<Carousel.Content>
 					{#each data.myLockerData.requests as request}
 						<Carousel.Item>
-							<Card.Root class="mt-10 flex h-[600px] w-[400px] items-center justify-center">
+							<Card.Root class="mt-10 flex h-[600px] w-[350px] items-center justify-center">
 								<Card.Content class="flex h-full w-fit flex-col items-center justify-between">
 									<div class="flex flex-col items-center">
 										<div class="flex items-center gap-2">
@@ -71,7 +71,7 @@
 											<h2 class="flex items-center gap-2"><User weight="bold" /> Single</h2>
 											<h1 class="text-8xl font-semibold">#{request.requested_locker_id}</h1>
 											<Separator />
-											<div class="mt-5 grid grid-cols-2 gap-x-4 text-muted-foreground">
+											<div class="text-muted-foreground mt-5 grid grid-cols-2 gap-x-4">
 												<p class="text-right">Full Name:</p>
 												<p>{request.name}</p>
 												<p class="text-right">Grade:</p>
@@ -83,7 +83,7 @@
 											<h2 class="flex items-center gap-2"><Users weight="bold" /> Partner</h2>
 											<h1 class="text-8xl font-semibold">#{request.requested_locker_id}</h1>
 											<Separator />
-											<div class="mt-5 grid grid-cols-2 gap-x-4 text-muted-foreground">
+											<div class="text-muted-foreground mt-5 grid grid-cols-2 gap-x-4">
 												<p class="text-right">Your Name:</p>
 												<p>{request.primary_name}</p>
 												<p class="text-right">Your Grade:</p>

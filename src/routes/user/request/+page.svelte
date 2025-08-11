@@ -59,7 +59,7 @@
 	<BackButton class="ml-10" />
 	<div class="flex flex-col items-center">
 		<h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">Request a Locker</h1>
-		<Tabs.Root value="single" class="mt-10 w-[400px]">
+		<Tabs.Root value="single" class="mt-10 w-[350px]">
 			<Tabs.List class="grid w-full grid-cols-2">
 				<Tabs.Trigger value="single"><User weight="bold" class="mr-2" /> Single</Tabs.Trigger>
 				<Tabs.Trigger value="partner"><Users weight="bold" class="mr-2" />Partner</Tabs.Trigger>
