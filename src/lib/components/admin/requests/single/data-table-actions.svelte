@@ -71,7 +71,7 @@
 				<Dialog.Description>This action cannot be undone.</Dialog.Description>
 			</Dialog.Header>
 			<div class="flex w-full flex-col gap-1.5">
-				<Label>Comments</Label>
+				<Label>Comments (optional)</Label>
 				<Input bind:value={comments} />
 			</div>
 			<Dialog.Footer>

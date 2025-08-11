@@ -27,11 +27,20 @@ export const load: PageServerLoad = async ({ request, fetch }) => {
 			error(myLockerRes.status, myLockerRes.statusText);
 		}
 
+		let acceptingRequestsData = null;
+		const acceptingRequestsRes = await fetch('/api/user?accepting=true');
+		if (acceptingRequestsRes.status === 200) {
+			acceptingRequestsData = acceptingRequestsRes.json();
+		} else {
+			error(acceptingRequestsRes.status, acceptingRequestsRes.statusText);
+		}
+
 		return {
 			lockersData: await lockersData,
 			myLockerData: await myLockerData,
 			singleForm: await superValidate(zod(singleLockerRequestFormSchema)),
-			partnerForm: await superValidate(zod(partnerLockerRequestFormSchema))
+			partnerForm: await superValidate(zod(partnerLockerRequestFormSchema)),
+			acceptingRequestsData: await acceptingRequestsData
 		};
 	}
 };

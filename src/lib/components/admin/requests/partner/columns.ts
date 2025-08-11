@@ -106,7 +106,7 @@ export const partnerRequestColumns: ColumnDef<Request>[] = [
 		accessorKey: 'requested_locker_id',
 		header: () => {
 			const snippet = createRawSnippet(() => ({
-				render: () => `<div>Requested<br/>Locker ID</div>`
+				render: () => `<div>Requested<br/>Locker #</div>`
 			}));
 			return renderSnippet(snippet, '');
 		}
