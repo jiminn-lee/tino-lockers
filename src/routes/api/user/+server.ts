@@ -4,9 +4,10 @@ import {
 	singleLockersRequests,
 	partnerLockersRequests,
 	singleLockers,
-	partnerLockers
+	partnerLockers,
+	settings
 } from '$lib/server/db/schema/lockers';
-import { eq, or, desc } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { singleLockerRequestFormSchema, partnerLockerRequestFormSchema } from '$lib/form-schema';
 import { auth } from '$lib/auth/auth';
 
@@ -146,6 +147,15 @@ export async function POST({ request }: RequestEvent) {
 
 export async function GET({ request }: RequestEvent) {
 	try {
+		const url = new URL(request.url);
+		const acceptingParam = url.searchParams.get('accepting');
+
+		if (acceptingParam === 'true') {
+			const [settingsData] = await db.select().from(settings);
+			const acceptingResponses = settingsData?.accepting_responses ?? false;
+			return json({ accepting_responses: acceptingResponses });
+		}
+
 		const session = await auth.api.getSession({
 			headers: request.headers
 		});
@@ -192,7 +202,7 @@ export async function GET({ request }: RequestEvent) {
 			}
 		});
 	} catch (error) {
-		console.error('Error fetching user data:', error);
+		console.error('Error fetching user data or settings:', error);
 		return json({ error: 'Failed to fetch data' }, { status: 500 });
 	}
 }

@@ -6,10 +6,32 @@ import {
 	partnerLockers,
 	singleLockersRequests,
 	partnerLockersRequests,
-	settings
+	settings,
 } from '$lib/server/db/schema/lockers';
+
+import { user as usersTable } from '$lib/server/db/schema/auth';
 import { eq, and, isNotNull, desc } from 'drizzle-orm';
 import { auth } from '$lib/auth/auth';
+import nodemailer from 'nodemailer';
+
+const transporter = nodemailer.createTransport({
+	service: 'gmail',
+	auth: {
+		user: process.env.GMAIL_USER,
+		pass: process.env.GMAIL_PASS
+	}
+});
+
+async function sendEmail(to: string, subject: string, text: string, html?: string) {
+	const mailOptions = {
+		from: `Tino Lockers <${process.env.GMAIL_USER}>`,
+		to,
+		subject,
+		text,
+		html
+	};
+	return transporter.sendMail(mailOptions);
+}
 
 const isAdmin = async (request: Request) => {
 	const session = await auth.api.getSession({ headers: request.headers });
@@ -49,7 +71,7 @@ export async function PUT({ request }: RequestEvent) {
 		}
 
 		const data = await request.json();
-		const { id, type, status, comments, action, lockerId, value } = data;
+		const { id, type, status, comments, action, lockerId: adminLockerId, value } = data;
 
 		const table =
 			type === 'single' ? singleLockers :
@@ -62,19 +84,18 @@ export async function PUT({ request }: RequestEvent) {
 				return json({ error: 'Invalid locker type' }, { status: 400 });
 			}
 
-
 			if (action === 'toggleAcceptingResponses') {
 				await db.update(settings).set({ accepting_responses: value === true });
 				return json({ success: true, message: `Accepting responses set to ${value}` });
 			}
 
 			if (action === 'clearLocker') {
-				if (!lockerId) return json({ error: 'Missing lockerId' }, { status: 400 });
+				if (!adminLockerId) return json({ error: 'Missing lockerId' }, { status: 400 });
 
 				if (type === 'single') {
 					await db.update(singleLockers)
 						.set({ user_id: null, name: null, grade: null, student_id: null, available: true })
-						.where(eq(singleLockers.id, lockerId));
+						.where(eq(singleLockers.id, adminLockerId));
 				} else {
 					await db.update(partnerLockers)
 						.set({
@@ -87,20 +108,20 @@ export async function PUT({ request }: RequestEvent) {
 							secondary_student_id: null,
 							available: true
 						})
-						.where(eq(partnerLockers.id, lockerId));
+						.where(eq(partnerLockers.id, adminLockerId));
 				}
 
-				return json({ success: true, message: `Locker ${lockerId} cleared` });
+				return json({ success: true, message: `Locker ${adminLockerId} cleared` });
 			}
 
 			if (action === 'markUnavailable') {
-				if (!lockerId) return json({ error: 'Missing lockerId' }, { status: 400 });
+				if (!adminLockerId) return json({ error: 'Missing lockerId' }, { status: 400 });
 
 				if (!table) {
 					return json({ error: 'Invalid locker type' }, { status: 400 });
 				}
 
-				const [locker] = await db.select().from(table!).where(eq(table!.id, lockerId));
+				const [locker] = await db.select().from(table!).where(eq(table!.id, adminLockerId));
 				if (!locker) return json({ error: 'Locker not found' }, { status: 404 });
 
 				let hasStudent: boolean;
@@ -114,7 +135,6 @@ export async function PUT({ request }: RequestEvent) {
 					return json({ error: 'Invalid locker type' }, { status: 400 });
 				}
 
-
 				if (hasStudent) {
 					return json({ error: 'Locker is occupied, cannot mark unavailable' }, { status: 400 });
 				}
@@ -122,30 +142,30 @@ export async function PUT({ request }: RequestEvent) {
 				if (type === 'single') {
 					await db.update(singleLockers)
 						.set({ available: false, name: 'N/A' })
-						.where(eq(singleLockers.id, lockerId));
+						.where(eq(singleLockers.id, adminLockerId));
 				} else {
 					await db.update(partnerLockers)
 						.set({ available: false, primary_name: 'N/A', secondary_name: 'N/A' })
-						.where(eq(partnerLockers.id, lockerId));
+						.where(eq(partnerLockers.id, adminLockerId));
 				}
 
-				return json({ success: true, message: `Locker ${lockerId} marked unavailable` });
+				return json({ success: true, message: `Locker ${adminLockerId} marked unavailable` });
 			}
 
 			if (action === 'markAvailable') {
-				if (!lockerId) return json({ error: 'Missing lockerId' }, { status: 400 });
+				if (!adminLockerId) return json({ error: 'Missing lockerId' }, { status: 400 });
 
 				if (type === 'single') {
 					await db.update(singleLockers)
 						.set({ available: true, name: null })
-						.where(eq(singleLockers.id, lockerId));
+						.where(eq(singleLockers.id, adminLockerId));
 				} else {
 					await db.update(partnerLockers)
 						.set({ available: true, primary_name: null, secondary_name: null })
-						.where(eq(partnerLockers.id, lockerId));
+						.where(eq(partnerLockers.id, adminLockerId));
 				}
 
-				return json({ success: true, message: `Locker ${lockerId} marked available` });
+				return json({ success: true, message: `Locker ${adminLockerId} marked available` });
 			}
 
 			return json({ error: 'Invalid admin action' }, { status: 400 });
@@ -160,8 +180,11 @@ export async function PUT({ request }: RequestEvent) {
 			comments: comments || null
 		};
 
+		let requestData;
+		let userEmail;
+
 		if (type === 'single') {
-			const [requestData] = await db
+			[requestData] = await db
 				.select()
 				.from(singleLockersRequests)
 				.where(
@@ -174,6 +197,8 @@ export async function PUT({ request }: RequestEvent) {
 			if (!requestData || !requestData.requested_locker_id) {
 				return json({ error: 'Request not found or no locker specified' }, { status: 404 });
 			}
+
+			const lockerId = requestData.requested_locker_id;
 
 			await db
 				.update(singleLockersRequests)
@@ -190,15 +215,19 @@ export async function PUT({ request }: RequestEvent) {
 						student_id: requestData.student_id,
 						available: false
 					})
-					.where(eq(singleLockers.id, requestData.requested_locker_id));
+					.where(eq(singleLockers.id, lockerId));
 			} else if (status === 'denied') {
 				await db
 					.update(singleLockers)
 					.set({ available: true })
-					.where(eq(singleLockers.id, requestData.requested_locker_id));
+					.where(eq(singleLockers.id, lockerId));
 			}
+
+			const [userRecord] = await db.select().from(usersTable).where(eq(usersTable.id, requestData.user_id));
+			userEmail = userRecord?.email;
+
 		} else if (type === 'partner') {
-			const [requestData] = await db
+			[requestData] = await db
 				.select()
 				.from(partnerLockersRequests)
 				.where(
@@ -211,6 +240,8 @@ export async function PUT({ request }: RequestEvent) {
 			if (!requestData || !requestData.requested_locker_id) {
 				return json({ error: 'Request not found or no locker specified' }, { status: 404 });
 			}
+
+			const lockerId = requestData.requested_locker_id;
 
 			await db
 				.update(partnerLockersRequests)
@@ -230,15 +261,34 @@ export async function PUT({ request }: RequestEvent) {
 						secondary_student_id: requestData.secondary_student_id,
 						available: false
 					})
-					.where(eq(partnerLockers.id, requestData.requested_locker_id));
+					.where(eq(partnerLockers.id, lockerId));
 			} else if (status === 'denied') {
 				await db
 					.update(partnerLockers)
 					.set({ available: true })
-					.where(eq(partnerLockers.id, requestData.requested_locker_id));
+					.where(eq(partnerLockers.id, lockerId));
 			}
+
+
+			const [userRecord] = await db.select().from(usersTable).where(eq(usersTable.id, requestData.user_id));
+			userEmail = userRecord?.email;
+
 		} else {
 			return json({ error: 'Invalid locker type' }, { status: 400 });
+		}
+
+		if (userEmail) {
+			const subject = `Locker Request ${status.charAt(0).toUpperCase() + status.slice(1)}`;
+			const message = `Hello,
+
+Your locker request has been ${status}.
+
+${comments ? `Comments from admin: ${comments}` : ''}
+
+Thank you,
+Tino Lockers Team`;
+
+			await sendEmail(userEmail, subject, message);
 		}
 
 		return json({ success: true, message: `Locker request ${status}` });
@@ -248,7 +298,6 @@ export async function PUT({ request }: RequestEvent) {
 		return json({ error: 'Failed to process request' }, { status: 500 });
 	}
 }
-
 
 /*
 
