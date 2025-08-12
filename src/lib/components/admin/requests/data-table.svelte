@@ -8,13 +8,15 @@
 	import { createSvelteTable, FlexRender } from '$lib/components/ui/data-table';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { Button } from '$lib/components/ui/button';
+	import { downloadCSV } from '$lib/csv';
+	import { DownloadSimple } from 'phosphor-svelte';
 
 	type DataTableProps<TData, TValue> = {
 		columns: ColumnDef<TData, TValue>[];
 		data: TData[];
 	};
 
-	let { data, columns }: DataTableProps<TData, TValue> = $props();
+	let { data, columns, fileName }: DataTableProps<TData, TValue> & { fileName: string } = $props();
 
 	let pagination = $state<PaginationState>({ pageIndex: 0, pageSize: 10 });
 
@@ -78,19 +80,21 @@
 	</div>
 	<div class="flex items-center justify-end space-x-2 py-4">
 		<Button
+			size="icon"
+			variant="secondary"
+			class="rounded-full"
+			onclick={() => {
+				downloadCSV(data as object[], fileName);
+			}}><DownloadSimple weight="bold" /></Button
+		>
+		<Button
 			variant="outline"
-			size="sm"
 			onclick={() => table.previousPage()}
 			disabled={!table.getCanPreviousPage()}
 		>
 			Previous
 		</Button>
-		<Button
-			variant="outline"
-			size="sm"
-			onclick={() => table.nextPage()}
-			disabled={!table.getCanNextPage()}
-		>
+		<Button variant="outline" onclick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
 			Next
 		</Button>
 	</div>

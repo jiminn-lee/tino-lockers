@@ -112,17 +112,18 @@ export const partnerRequestColumns: ColumnDef<Request>[] = [
 		}
 	},
 	{
+		header: 'Status',
 		id: 'actions',
 		cell: ({ row }) => {
 			const approvedCellSnippet = createRawSnippet<[string]>(() => {
 				return {
-					render: () => `<div class="text-green-500 text-center">Approved</div>`
+					render: () => `<div class="text-green-500">Approved</div>`
 				};
 			});
 
 			const deniedCellSnippet = createRawSnippet<[string]>(() => {
 				return {
-					render: () => `<div class="text-red-500 text-center">Denied</div>`
+					render: () => `<div class="text-red-500">Denied</div>`
 				};
 			});
 
