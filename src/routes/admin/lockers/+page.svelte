@@ -3,8 +3,9 @@
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import BackButton from '$lib/components/BackButton.svelte';
 	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
-	import { Check, Eraser, User, Users, X } from 'phosphor-svelte';
+	import { Check, DownloadSimple, Eraser, User, Users, X } from 'phosphor-svelte';
 	import { invalidateAll } from '$app/navigation';
+	import { downloadCSV } from '$lib/csv';
 
 	let { data } = $props();
 	let selectedTab = $state('single');
@@ -18,21 +19,42 @@
 	<BackButton class="ml-10" />
 	<div class="flex flex-col items-center">
 		<h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">Manage Lockers</h1>
-		<div class="mt-10 flex gap-2">
-			<Button
-				class="rounded-full"
-				variant={selectedTab === 'single' ? 'default' : 'outline'}
-				onclick={() => {
-					selectedTab = 'single';
-				}}><User weight="bold" /> Single</Button
-			>
-			<Button
-				class="rounded-full"
-				variant={selectedTab === 'partner' ? 'default' : 'outline'}
-				onclick={() => {
-					selectedTab = 'partner';
-				}}><Users weight="bold" />Partner</Button
-			>
+		<div class="mt-10 flex gap-6">
+			<div class="flex gap-1">
+				<Button
+					class="rounded-full"
+					variant={selectedTab === 'single' ? 'default' : 'outline'}
+					onclick={() => {
+						selectedTab = 'single';
+					}}
+					><User weight="bold" /> Single
+				</Button>
+				<Button
+					size="icon"
+					variant="secondary"
+					class="rounded-full"
+					onclick={() => {
+						downloadCSV(data.lockersData.singleLockers, 'singleLockers');
+					}}><DownloadSimple weight="bold" /></Button
+				>
+			</div>
+			<div class="flex gap-1">
+				<Button
+					class="rounded-full"
+					variant={selectedTab === 'partner' ? 'default' : 'outline'}
+					onclick={() => {
+						selectedTab = 'partner';
+					}}><Users weight="bold" />Partner</Button
+				>
+				<Button
+					size="icon"
+					variant="secondary"
+					class="rounded-full"
+					onclick={() => {
+						downloadCSV(data.lockersData.partnerLockers, 'partnerLockers');
+					}}><DownloadSimple weight="bold" /></Button
+				>
+			</div>
 		</div>
 		<div
 			class="sticky top-0 flex flex-wrap justify-center gap-x-8 gap-y-4 rounded-b-3xl bg-zinc-950 p-5"

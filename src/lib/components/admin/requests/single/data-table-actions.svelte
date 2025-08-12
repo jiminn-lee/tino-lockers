@@ -46,7 +46,7 @@
 
 <div class="flex gap-1">
 	<Dialog.Root bind:open={isApproveDialogOpen}>
-		<Dialog.Trigger class={buttonVariants()}>Approve</Dialog.Trigger>
+		<Dialog.Trigger class={buttonVariants({ size: 'sm' })}>Approve</Dialog.Trigger>
 		<Dialog.Content>
 			<Dialog.Header>
 				<Dialog.Title>Approve locker request?</Dialog.Title>
@@ -64,7 +64,7 @@
 		</Dialog.Content>
 	</Dialog.Root>
 	<Dialog.Root bind:open={isDenyDialogOpen}>
-		<Dialog.Trigger class={buttonVariants({ variant: 'outline' })}>Deny</Dialog.Trigger>
+		<Dialog.Trigger class={buttonVariants({ variant: 'outline', size: 'sm' })}>Deny</Dialog.Trigger>
 		<Dialog.Content>
 			<Dialog.Header>
 				<Dialog.Title>Deny locker request?</Dialog.Title>

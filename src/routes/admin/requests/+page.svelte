@@ -37,16 +37,24 @@
 				}}
 			/>
 		</div>
-		<Tabs.Root value="single">
+		<Tabs.Root value="single" class="w-full px-14 lg:px-28">
 			<Tabs.List class="grid w-full grid-cols-2">
 				<Tabs.Trigger value="single"><User weight="bold" class="mr-2" /> Single</Tabs.Trigger>
 				<Tabs.Trigger value="partner"><Users weight="bold" class="mr-2" />Partner</Tabs.Trigger>
 			</Tabs.List>
-			<Tabs.Content value="single">
-				<DataTable data={data.requestsData.single} columns={singleRequestColumns} />
+			<Tabs.Content value="single" class="w-full">
+				<DataTable
+					data={data.requestsData.single}
+					columns={singleRequestColumns}
+					fileName="singleRequests"
+				/>
 			</Tabs.Content>
-			<Tabs.Content value="partner">
-				<DataTable data={data.requestsData.partner} columns={partnerRequestColumns} />
+			<Tabs.Content value="partner" class="w-full">
+				<DataTable
+					data={data.requestsData.partner}
+					columns={partnerRequestColumns}
+					fileName="partnerRequests"
+				/>
 			</Tabs.Content>
 		</Tabs.Root>
 	</div>
