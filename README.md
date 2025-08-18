@@ -1,4 +1,12 @@
 
+<div align="center">
+<img src="static/tino-lockers.png" width="300">
+<img src="static/lockers.png" width="300">
+<img src="static/requests.png" width="300">
+<img src="static/request.png" width="300">
+<img src="static/my-locker.png" width="300">
+  
+</div>
 
 <h1 align="center">Tino Lockers</h1>
 <p align="center">Cupertino High School's official locker management application.</p>
