@@ -7,7 +7,7 @@ import {
 	partnerLockers,
 	settings
 } from '$lib/server/db/schema/lockers';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { singleLockerRequestFormSchema, partnerLockerRequestFormSchema } from '$lib/form-schema';
 import { auth } from '$lib/auth/auth';
 
@@ -58,30 +58,54 @@ export async function POST({ request }: RequestEvent) {
 			}
 
 			if (data.requested_locker_id) {
-				await db.transaction(async (tx) => {
-					await tx.insert(singleLockersRequests).values({
-						user_id: session.user.id,
-						name: data.name,
-						grade: parseInt(data.grade),
-						student_id: data.student_id,
-						requested_locker_id: data.requested_locker_id,
-						status: 'pending',
-						date_modified: new Date(),
-						comments: null
-					});
+			
+				try {
+					await db.transaction(async (tx) => {
+					
+						const updateResult = await tx
+							.update(singleLockers)
+							.set({ available: false })
+							.where(
+								and(
+									eq(singleLockers.id, data.requested_locker_id),
+									eq(singleLockers.available, true)
+								)
+							);
 
-					await tx
-						.update(singleLockers)
-						.set({ available: false })
-						.where(eq(singleLockers.id, data.requested_locker_id));
-				});
+						
+						if (((updateResult as unknown) as { affectedRows: bigint }).affectedRows === 0n) {
+							throw new Error('LOCKER_UNAVAILABLE');
+						}
+
+					
+						await tx.insert(singleLockersRequests).values({
+							user_id: session.user.id,
+							name: data.name,
+							grade: parseInt(data.grade),
+							student_id: data.student_id,
+							requested_locker_id: data.requested_locker_id,
+							status: 'pending',
+							date_modified: new Date(),
+							comments: null
+						});
+					});
+				} catch (error) {
+					if (error instanceof Error && error.message === 'LOCKER_UNAVAILABLE') {
+						return json(
+							{ error: 'The selected locker is no longer available. Please choose another locker.' },
+							{ status: 409 }
+						);
+					}
+					throw error; 
+				}
 			} else {
+				
 				await db.insert(singleLockersRequests).values({
 					user_id: session.user.id,
 					name: data.name,
 					grade: parseInt(data.grade),
 					student_id: data.student_id,
-					requested_locker_id: data.requested_locker_id || null,
+					requested_locker_id: null,
 					status: 'pending',
 					date_modified: new Date(),
 					comments: null
@@ -99,27 +123,51 @@ export async function POST({ request }: RequestEvent) {
 			}
 
 			if (data.requested_locker_id) {
-				await db.transaction(async (tx) => {
-					await tx.insert(partnerLockersRequests).values({
-						user_id: session.user.id,
-						primary_name: data.primary_name,
-						primary_grade: parseInt(data.primary_grade),
-						primary_student_id: data.primary_student_id,
-						secondary_name: data.secondary_name,
-						secondary_grade: parseInt(data.secondary_grade),
-						secondary_student_id: data.secondary_student_id,
-						requested_locker_id: data.requested_locker_id,
-						status: 'pending',
-						date_modified: new Date(),
-						comments: null
-					});
+				
+				try {
+					await db.transaction(async (tx) => {
+				
+						const updateResult = await tx
+							.update(partnerLockers)
+							.set({ available: false })
+							.where(
+								and(
+									eq(partnerLockers.id, data.requested_locker_id),
+									eq(partnerLockers.available, true)
+								)
+							);
 
-					await tx
-						.update(partnerLockers)
-						.set({ available: false })
-						.where(eq(partnerLockers.id, data.requested_locker_id));
-				});
+						
+						if (((updateResult as unknown) as { affectedRows: bigint }).affectedRows === 0n) {
+							throw new Error('LOCKER_UNAVAILABLE');
+						}
+
+						
+						await tx.insert(partnerLockersRequests).values({
+							user_id: session.user.id,
+							primary_name: data.primary_name,
+							primary_grade: parseInt(data.primary_grade),
+							primary_student_id: data.primary_student_id,
+							secondary_name: data.secondary_name,
+							secondary_grade: parseInt(data.secondary_grade),
+							secondary_student_id: data.secondary_student_id,
+							requested_locker_id: data.requested_locker_id,
+							status: 'pending',
+							date_modified: new Date(),
+							comments: null
+						});
+					});
+				} catch (error) {
+					if (error instanceof Error && error.message === 'LOCKER_UNAVAILABLE') {
+						return json(
+							{ error: 'The selected locker is no longer available. Please choose another locker.' },
+							{ status: 409 }
+						);
+					}
+					throw error; 
+				}
 			} else {
+				
 				await db.insert(partnerLockersRequests).values({
 					user_id: session.user.id,
 					primary_name: data.primary_name,
@@ -128,7 +176,7 @@ export async function POST({ request }: RequestEvent) {
 					secondary_name: data.secondary_name,
 					secondary_grade: parseInt(data.secondary_grade),
 					secondary_student_id: data.secondary_student_id,
-					requested_locker_id: data.requested_locker_id || null,
+					requested_locker_id: null,
 					status: 'pending',
 					date_modified: new Date(),
 					comments: null
