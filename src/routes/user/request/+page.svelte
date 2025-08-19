@@ -18,6 +18,7 @@
 	import type { PageProps } from './$types';
 	import { CheckCircle, User, Users } from 'phosphor-svelte';
 	import { Separator } from '$lib/components/ui/separator/index.js';
+	import { page } from '$app/state';
 
 	let {
 		data
@@ -35,25 +36,28 @@
 		onUpdate: ({ form: f }) => {
 			if (f.valid) {
 				toast.success('Request successfully submitted!');
-			} else {
-				toast.error('Please fix the errors in the form.');
+			} else if (f.errors) {
+				toast.error(f.message);
 			}
 		},
 		delayMs: 500,
 		timeoutMs: 8000
 	});
-	const { form: singleFormData, enhance: singleEnhance, delayed } = singleForm;
+	const { form: singleFormData, enhance: singleEnhance, message } = singleForm;
+
+	console.log(message);
 
 	const partnerForm = superForm(data.partnerForm, {
 		validators: zodClient(partnerLockerRequestFormSchema),
 		onUpdate: ({ form: f }) => {
 			if (f.valid) {
 				toast.success('Request successfully submitted!');
-			} else {
-				toast.error('Please fix the errors in the form.');
+			} else if (f.errors) {
+				toast.error(f.message);
 			}
 		}
 	});
+
 	const { form: partnerFormData, enhance: partnerEnhance } = partnerForm;
 </script>
 
