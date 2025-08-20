@@ -57,7 +57,7 @@
 			</div>
 		</div>
 		<div
-			class="sticky top-0 flex flex-wrap justify-center gap-x-8 gap-y-4 rounded-b-3xl dark:bg-zinc-950 p-5"
+			class="sticky top-0 flex flex-wrap justify-center gap-x-8 gap-y-4 rounded-b-3xl bg-zinc-950 p-5"
 		>
 			<div class="text-muted-foreground flex items-center text-sm">
 				<div class="mr-2 size-4 rounded-full bg-green-900"></div>
@@ -208,13 +208,13 @@
 						</Card.Header>
 						<Card.Content class="text-xs">
 							<p class="text-muted-foreground wrap-anywhere">
-								Name: <span class="text-black dark:text-white">{locker.name} </span>
+								Name: <span class="text-white">{locker.name} </span>
 							</p>
 							<p class="text-muted-foreground">
-								Student ID: <span class="text-black dark:text-white">{locker.student_id}</span>
+								Student ID: <span class="text-white">{locker.student_id}</span>
 							</p>
 							<p class="text-muted-foreground">
-								Grade: <span class="text-black dark:text-white">{locker.grade}</span>
+								Grade: <span class="text-white">{locker.grade}</span>
 							</p>
 						</Card.Content>
 					</Card.Root>
