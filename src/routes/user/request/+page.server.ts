@@ -1,5 +1,5 @@
 import type { PageServerLoad } from './$types';
-import { superValidate, fail } from 'sveltekit-superforms';
+import { superValidate, fail, message } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { partnerLockerRequestFormSchema, singleLockerRequestFormSchema } from '$lib/form-schema';
 import { error } from 'console';
@@ -70,7 +70,11 @@ export const actions = {
 		if (requestSingleLockerRes.status === 200) {
 			redirect(307, '/user/my-locker');
 		} else {
-			return error(requestSingleLockerRes.status, requestSingleLockerRes.statusText);
+			return message(
+				form,
+				'Something went wrong. Someone may have already requested this locker. Please refresh and try again.',
+				{ status: 409 }
+			);
 		}
 	},
 	requestPartnerLocker: async ({ fetch, request }) => {
@@ -101,7 +105,11 @@ export const actions = {
 		if (requestPartnerLockerRes.status === 200) {
 			redirect(307, '/user/my-locker');
 		} else {
-			return error(requestPartnerLockerRes.status, requestPartnerLockerRes.statusText);
+			return message(
+				form,
+				'Something went wrong. Someone may have already requested this locker. Please refresh and try again.',
+				{ status: 409 }
+			);
 		}
 	}
 };
