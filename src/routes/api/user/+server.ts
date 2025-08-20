@@ -7,7 +7,7 @@ import {
 	partnerLockers,
 	settings
 } from '$lib/server/db/schema/lockers';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, sql, inArray } from 'drizzle-orm';
 import { singleLockerRequestFormSchema, partnerLockerRequestFormSchema } from '$lib/form-schema';
 import { auth } from '$lib/auth/auth';
 
@@ -58,24 +58,46 @@ export async function POST({ request }: RequestEvent) {
 			}
 
 			if (data.requested_locker_id) {
-			
 				try {
 					await db.transaction(async (tx) => {
-					
-						const updateResult = await tx
-							.update(singleLockers)
-							.set({ available: false })
+						
+						const lockerCheckResult = await tx.execute(sql`
+							SELECT id, available 
+							FROM ${singleLockers} 
+							WHERE id = ${data.requested_locker_id} 
+							FOR UPDATE
+						`);
+
+						const lockerCheck = lockerCheckResult[0];
+
+						if (!lockerCheck) {
+							throw new Error('LOCKER_NOT_FOUND');
+						}
+
+						if (!lockerCheck.available) {
+							throw new Error('LOCKER_UNAVAILABLE');
+						}
+
+						
+						const existingRequests = await tx
+							.select({ id: singleLockersRequests.id })
+							.from(singleLockersRequests)
 							.where(
 								and(
-									eq(singleLockers.id, data.requested_locker_id),
-									eq(singleLockers.available, true)
+									eq(singleLockersRequests.requested_locker_id, data.requested_locker_id),
+									inArray(singleLockersRequests.status, ['pending', 'approved'])
 								)
 							);
 
-						
-						if (((updateResult as unknown) as { affectedRows: bigint }).affectedRows === 0n) {
-							throw new Error('LOCKER_UNAVAILABLE');
+						if (existingRequests.length > 0) {
+							throw new Error('LOCKER_ALREADY_REQUESTED');
 						}
+
+						
+						await tx
+							.update(singleLockers)
+							.set({ available: false })
+							.where(eq(singleLockers.id, data.requested_locker_id));
 
 					
 						await tx.insert(singleLockersRequests).values({
@@ -90,16 +112,24 @@ export async function POST({ request }: RequestEvent) {
 						});
 					});
 				} catch (error) {
-					if (error instanceof Error && error.message === 'LOCKER_UNAVAILABLE') {
-						return json(
-							{ error: 'The selected locker is no longer available. Please choose another locker.' },
-							{ status: 409 }
-						);
+					if (error instanceof Error) {
+						switch (error.message) {
+							case 'LOCKER_NOT_FOUND':
+								return json(
+									{ error: 'The selected locker does not exist.' },
+									{ status: 404 }
+								);
+							case 'LOCKER_UNAVAILABLE':
+							case 'LOCKER_ALREADY_REQUESTED':
+								return json(
+									{ error: 'The selected locker is no longer available. Please choose another locker.' },
+									{ status: 409 }
+								);
+						}
 					}
-					throw error; 
+					throw error;
 				}
 			} else {
-				
 				await db.insert(singleLockersRequests).values({
 					user_id: session.user.id,
 					name: data.name,
@@ -123,26 +153,48 @@ export async function POST({ request }: RequestEvent) {
 			}
 
 			if (data.requested_locker_id) {
-				
 				try {
 					await db.transaction(async (tx) => {
-				
-						const updateResult = await tx
-							.update(partnerLockers)
-							.set({ available: false })
-							.where(
-								and(
-									eq(partnerLockers.id, data.requested_locker_id),
-									eq(partnerLockers.available, true)
-								)
-							);
-
 						
-						if (((updateResult as unknown) as { affectedRows: bigint }).affectedRows === 0n) {
+						const lockerCheckResult = await tx.execute(sql`
+							SELECT id, available 
+							FROM ${partnerLockers} 
+							WHERE id = ${data.requested_locker_id} 
+							FOR UPDATE
+						`);
+
+						const lockerCheck = lockerCheckResult[0];
+
+						if (!lockerCheck) {
+							throw new Error('LOCKER_NOT_FOUND');
+						}
+
+						if (!lockerCheck.available) {
 							throw new Error('LOCKER_UNAVAILABLE');
 						}
 
+
+						const existingRequests = await tx
+							.select({ id: partnerLockersRequests.id })
+							.from(partnerLockersRequests)
+							.where(
+								and(
+									eq(partnerLockersRequests.requested_locker_id, data.requested_locker_id),
+									inArray(partnerLockersRequests.status, ['pending', 'approved'])
+								)
+							);
+
+						if (existingRequests.length > 0) {
+							throw new Error('LOCKER_ALREADY_REQUESTED');
+						}
+
 						
+						await tx
+							.update(partnerLockers)
+							.set({ available: false })
+							.where(eq(partnerLockers.id, data.requested_locker_id));
+
+					
 						await tx.insert(partnerLockersRequests).values({
 							user_id: session.user.id,
 							primary_name: data.primary_name,
@@ -158,16 +210,24 @@ export async function POST({ request }: RequestEvent) {
 						});
 					});
 				} catch (error) {
-					if (error instanceof Error && error.message === 'LOCKER_UNAVAILABLE') {
-						return json(
-							{ error: 'The selected locker is no longer available. Please choose another locker.' },
-							{ status: 409 }
-						);
+					if (error instanceof Error) {
+						switch (error.message) {
+							case 'LOCKER_NOT_FOUND':
+								return json(
+									{ error: 'The selected locker does not exist.' },
+									{ status: 404 }
+								);
+							case 'LOCKER_UNAVAILABLE':
+							case 'LOCKER_ALREADY_REQUESTED':
+								return json(
+									{ error: 'The selected locker is no longer available. Please choose another locker.' },
+									{ status: 409 }
+								);
+						}
 					}
-					throw error; 
+					throw error;
 				}
 			} else {
-				
 				await db.insert(partnerLockersRequests).values({
 					user_id: session.user.id,
 					primary_name: data.primary_name,
